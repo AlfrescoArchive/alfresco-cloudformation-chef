@@ -28,7 +28,7 @@ ROLE            = sys.argv[9]
 #generate random string to append to launch config and AS group names to prevent collisions
 randomStr = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(6))
 asLCstr = 'AlfrescoLC-' + randomStr
-asGrpStr = 'AlfrescoGrp-'+ randomStr 
+asGrpStr = 'AlfrescoGrp-'+ randomStr
 #connect to region
 logging.debug(  ' region %s  ELB %s   INSTANCE %s  KEY %s  SECGRP %s TYPE %s  AZLIST %s  VPC_ZONE %s ROLE %s', REGION, ELB_NAME, INSTANCE, KEY, SECGRP, TYPE, AZLIST, VPC_ZONE, ROLE)
 conn = boto.ec2.connect_to_region(REGION)
@@ -62,11 +62,11 @@ conn_as.create_or_update_tags([as_tag])
 
 #create scale up and scale down policies for the autoscale group
 scaleUpPolicy = ScalingPolicy(name='alfrescoScaleUp-'+randomStr, adjustment_type='ChangeInCapacity', as_name=autoscaleGroup.name, scaling_adjustment=2, cooldown=1200)
-scaleDownPolicy = ScalingPolicy(name='alfrescoScaleDown-'+randomStr, adjustment_type='ChangeInCapacity', as_name=autoscaleGroup.name, scaling_adjustment=-1, cooldown=600) 
+scaleDownPolicy = ScalingPolicy(name='alfrescoScaleDown-'+randomStr, adjustment_type='ChangeInCapacity', as_name=autoscaleGroup.name, scaling_adjustment=-1, cooldown=600)
 conn_as.create_scaling_policy(scaleUpPolicy)
 conn_as.create_scaling_policy(scaleDownPolicy)
 
-#redeclare policies to populate the ARN fields 
+#redeclare policies to populate the ARN fields
 policyResults = conn_as.get_all_policies(as_group=autoscaleGroup.name, policy_names=[scaleUpPolicy.name])
 scaleUpPolicy = policyResults[0]
 
@@ -79,20 +79,17 @@ cw_conn = boto.ec2.cloudwatch.connect_to_region(REGION)
 #create the following alarms: ScaleUp @ Avg CPU >60% over 2 periods OR ELB latency >= 0.5sec.  ScaleDown @ Avg CPU <30% over 2 periods
 
 dimensions = {"AutoScalingGroupName" : autoscaleGroup.name}
-dimensions_elb = {"LoadBalancerName" : ELB_NAME} 
+dimensions_elb = {"LoadBalancerName" : ELB_NAME}
 scaleUpAlarmCPU = MetricAlarm(name='Alfresco-HighCPU', namespace='AWS/EC2',metric='CPUUtilization', statistic='Average', comparison='>', threshold='60', evaluation_periods=2, period=60, unit='Percent' , alarm_actions=[scaleUpPolicy.policy_arn], dimensions=dimensions)
-
 scaleDownAlarmCPU = MetricAlarm(name='Alfresco-LowCPU', namespace='AWS/EC2',metric='CPUUtilization', statistic='Average', comparison='<', threshold='30', evaluation_periods=2, period=60, unit='Percent', alarm_actions=[scaleDownPolicy.policy_arn], dimensions=dimensions)
-
 scaleUpAlarmLatency = MetricAlarm(name='Alfresco-HighLatency', namespace='AWS/ELB', metric='Latency', statistic='Average', comparison='>', threshold='1', evaluation_periods=2, period=60, unit='Seconds', alarm_actions=[scaleUpPolicy.policy_arn],dimensions=dimensions_elb)
 
 cw_conn.create_alarm(scaleUpAlarmCPU)
 cw_conn.create_alarm(scaleDownAlarmCPU)
 cw_conn.create_alarm(scaleUpAlarmLatency)
- 
-## TODO: uncomment terminate instance command 
+
+## TODO: uncomment terminate instance command
 #Terminate this setup instance now that auto-scaling is configured
 conn.terminate_instances(INSTANCE)
 
 #done
-
