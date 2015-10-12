@@ -93,17 +93,16 @@
     },
    "Mappings" : {
     "ALINUXAMI" : {
-      "us-east-1"      : { "AMI" : "ami-e3106686" },
-      "us-west-2"      : { "AMI" : "ami-9ff7e8af" },
-      "us-west-1"      : { "AMI" : "ami-cd3aff89" },
-      "eu-west-1"      : { "AMI" : "ami-69b9941e" },
-      "eu-central-1"   : { "AMI" : "ami-daaeaec7" },
-      "ap-southeast-1" : { "AMI" : "ami-52978200" },
-      "ap-southeast-2" : { "AMI" : "ami-c11856fb" },
-      "ap-northeast-1" : { "AMI" : "ami-9a2fb89a" },
-      "sa-east-1"      : { "AMI" : "ami-3b0c9926" }
+      "us-east-1"      : { "AMI" : "ami-96a818fe" },
+      "us-west-2"      : { "AMI" : "ami-c7d092f7" },
+      "us-west-1"      : { "AMI" : "ami-6bcfc42e" },
+      "eu-west-1"      : { "AMI" : "ami-e4ff5c93" },
+      "eu-central-1"   : { "AMI" : "ami-7cc4f661" },
+      "ap-southeast-1" : { "AMI" : "ami-aea582fc" },
+      "ap-southeast-2" : { "AMI" : "ami-bd523087" },
+      "ap-northeast-1" : { "AMI" : "ami-89634988" },
+      "sa-east-1"      : { "AMI" : "ami-bf9520a2" }
     },
-
 
     "AWSNATAMI" : {
       "us-east-1"      : { "AMI" : "ami-4c9e4b24" },
@@ -115,7 +114,6 @@
       "ap-southeast-2" : { "AMI" : "ami-996402a3" },
       "ap-northeast-1" : { "AMI" : "ami-55c29e54" },
       "sa-east-1"      : { "AMI" : "ami-b972dba4" }
-
     },
 
     "SubnetConfig" : {
@@ -138,7 +136,6 @@
     },
 
  "Resources" : {
-
     "VPC" : {
       "Type" : "AWS::EC2::VPC",
       "Properties" : {
@@ -302,11 +299,9 @@
         "VpcId" : { "Ref" : "VPC" },
          "SecurityGroupIngress" : [
            { "IpProtocol" : "tcp", "FromPort" : "80",  "ToPort" : "80",  "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "VPC", "CIDR" ]} } ,
-           { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "VPC", "CIDR" ]} } ,
            { "IpProtocol" : "tcp", "FromPort" : "22",  "ToPort" : "22",  "CidrIp" : { "Ref" : "SSHFrom" }} ],
         "SecurityGroupEgress" : [
            { "IpProtocol" : "tcp", "FromPort" : "80",  "ToPort" : "80",  "CidrIp" : "0.0.0.0/0" } ,
-           { "IpProtocol" : "tcp", "FromPort" : "443", "ToPort" : "443", "CidrIp" : "0.0.0.0/0" } ,
            { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco2", "CIDR" ]} } ,
            { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco1", "CIDR" ]} } ]
       }
@@ -323,14 +318,14 @@
       [
         {
          "LoadBalancerPort" : "80",
-         "InstancePort" :  "8080" ,
+         "InstancePort" :  "80" ,
          "Protocol" : "HTTP",
          "PolicyNames" : [ "AlfrescoCluster"]
-         }
+       }
       ],
 
       "HealthCheck" : {
-         "Target" : { "Fn::Join" : [ "", ["HTTP:", "8080" , "/alfresco"]]},
+         "Target" : { "Fn::Join" : [ "", ["HTTP:", "80" , "/alfresco"]]},
          "HealthyThreshold" : "2",
          "UnhealthyThreshold" : "3",
          "Interval" : "30",
@@ -345,13 +340,12 @@
                 "VpcId" : { "Ref" : "VPC" },
         "SecurityGroupIngress" :
                 [
-                    { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"},
-                    { "IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : "0.0.0.0/0"}
+                    { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0"}
                 ],
         "SecurityGroupEgress" :
                 [
-                    {"IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco1", "CIDR" ]} },
-                    {"IpProtocol" : "tcp", "FromPort" : "8080", "ToPort" : "8080", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco2", "CIDR" ]} }
+                    {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco1", "CIDR" ]} },
+                    {"IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : { "Fn::FindInMap" : [ "SubnetConfig", "Alfresco2", "CIDR" ]} }
                 ]
               }
     },
@@ -395,6 +389,11 @@
            "#!/bin/bash -v\n",
 
 ** HERE OUR CHEF CODE **
+            "wget https://artifacts.alfresco.com/nexus/service/local/repositories/internal-snapshots/content/org/alfresco/devops/chef-alfresco/0.6.4-SNAPSHOT/chef-alfresco-0.6.4-20151004.113610-1.tar.gz -O /tmp/chef-alfresco.tar.gz"
+            "tar zxvf /tmp/chef-alfresco.tar.gz -C /tmp"
+            "mv -f /tmp/cookbooks /etc/chef"
+            "wget share.json -O /etc/chef/share.json"
+            "wget solr.json -O /etc/chef/solr.json"
 
             "yum update -y aws* \n",
             "yum install -y python-boto*\n" ,
