@@ -1,14 +1,14 @@
 {
     "AWSTemplateFormatVersion": "2015-10-12",
-    "Description": "**Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage, a local cache on ephemeral volumes, and an multi-AZ Aurora RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
+    "Description": "**Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage, a local cache on ephemeral volumes, and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
 
     "Parameters": {
-      "KeyName":
+       "KeyName":
         {
             "Type": "AWS::EC2::KeyPair::KeyName",
             "Description": "Name of an existing EC2 KeyPair, all instances will launch with this KeyPair"
-        },
-      "OperatorEMail": {
+      },
+       "OperatorEMail": {
             "Description": "EMail address to notify if there are any scaling operations",
             "Type": "String",
             "AllowedPattern": "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)",
@@ -35,7 +35,7 @@
         "AZ2":
         {
             "Type":"String",
-            "Description" : "Second availabiltiy zone to deploy into (must be the same region as AZ1)",
+            "Description" : "Second availabiltiy zone to deploy into (must be the same region as for AZ1)",
             "AllowedValues" : ["eu-west-1a","eu-west-1b","eu-west-1c","eu-central-1a","eu-central-1b","us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-west-1a","us-west-1b","us-west-1c","ap-southeast-1a","ap-southeast-1b","ap-northeast-1a","ap-northeast-1b","ap-northeast-1c","us-west-2a","us-west-2b","us-west-2c","sa-east-1a","sa-east-1b, ap2-southeast-1b, ap2-southeast-1a"],
             "ConstraintDescription" : "Must be a valid EC2 Availabilty zone"
         },
@@ -44,16 +44,16 @@
             "Default": "m1.xlarge",
             "Description" : "Type of EC2 instance for the Alfresco instances (Share + Repository)",
             "Type": "String",
-            "AllowedValues" : [ "c1.medium","c1.xlarge","c3.large","c3.xlarge","c3.2xlarge","c3.4xlarge","c3.8xlarge","c4.large","c4.xlarge","c4.2xlarge","c4.4xlarge","c4.8xlarge","cc2.8xlarge","cg1.4xlarge","cr1.8xlarge","d2.xlarge","d2.2xlarge","d2.4xlarge","d2.8xlarge","g2.2xlarge","g2.8xlarge","hi1.4xlarge","hs1.8xlarge","i2.xlarge","i2.2xlarge","i2.4xlarge","i2.8xlarge","m1.small","m1.medium","m1.large","m1.xlarge","m2.xlarge","m2.2xlarge","m2.4xlarge","m3.medium","m3.large","m3.xlarge","m3.2xlarge","m4.10xlarge","m4.large","m4.xlarge","m4.2xlarge","m4.4xlarge","r3.large","r3.xlarge","r3.2xlarge","r3.4xlarge","r3.8xlarge","t1.micro","t2.micro","t2.small","t2.medium","t2.large"  ],
-            "ConstraintDescription" : "Must contain valid instance type, check them all here https://aws.amazon.com/ec2/instance-types/"
+            "AllowedValues" : [ "t2.medium","t2.large","m4.large","m4.xlarge","m4.2xlarge","m4.4xlarge","m4.10xlarge","m3.medium","m3.large","m3.xlarge","m3.2xlarge","c4.large","c4.xlarge","c4.2xlarge","c4.4xlarge","c4.8xlarge","c3.large","c3.xlarge","c3.2xlarge","c3.4xlarge","c3.8xlarge","r3.large","r3.xlarge"  ],
+            "ConstraintDescription" : "Must contain valid instance type"
         },
         "IndexInstanceType":
         {
             "Default": "m1.xlarge",
             "Description" : "Type of EC2 instance for the Alfresco Index instances (Solr)",
             "Type": "String",
-            "AllowedValues" : [ "c1.medium","c1.xlarge","c3.large","c3.xlarge","c3.2xlarge","c3.4xlarge","c3.8xlarge","c4.large","c4.xlarge","c4.2xlarge","c4.4xlarge","c4.8xlarge","cc2.8xlarge","cg1.4xlarge","cr1.8xlarge","d2.xlarge","d2.2xlarge","d2.4xlarge","d2.8xlarge","g2.2xlarge","g2.8xlarge","hi1.4xlarge","hs1.8xlarge","i2.xlarge","i2.2xlarge","i2.4xlarge","i2.8xlarge","m1.small","m1.medium","m1.large","m1.xlarge","m2.xlarge","m2.2xlarge","m2.4xlarge","m3.medium","m3.large","m3.xlarge","m3.2xlarge","m4.10xlarge","m4.large","m4.xlarge","m4.2xlarge","m4.4xlarge","r3.large","r3.xlarge","r3.2xlarge","r3.4xlarge","r3.8xlarge","t1.micro","t2.micro","t2.small","t2.medium","t2.large"  ],
-            "ConstraintDescription" : "Must contain valid instance type, check them all here https://aws.amazon.com/ec2/instance-types/"
+            "AllowedValues" : [ "t2.medium","t2.large","m4.large","m4.xlarge","m4.2xlarge","m4.4xlarge","m4.10xlarge","m3.medium","m3.large","m3.xlarge","m3.2xlarge","c4.large","c4.xlarge","c4.2xlarge","c4.4xlarge","c4.8xlarge","c3.large","c3.xlarge","c3.2xlarge","c3.4xlarge","c3.8xlarge","r3.large","r3.xlarge"  ],
+            "ConstraintDescription" : "Must contain valid instance type"
         },
         "NATInstanceType":
         {
@@ -66,7 +66,7 @@
         "RDSInstanceType":
          {
              "Default": "db.m1.small",
-             "Description" : "Type of EC2 instance for the Aurora DB instances",
+             "Description" : "Type of EC2 instance for the MySQL DB instances",
              "Type": "String",
              "AllowedValues" : [ "db.t1.micro","db.m1.small","db.m3.medium","db.m3.large","db.m3.xlarge","db.m3.2xlarge","db.r3.large","db.r3.xlarge","db.r3.2xlarge","db.r3.4xlarge","db.r3.8xlarge","db.t2.micro","db.t2.small","db.t2.medium","db.t2.large","db.m2.xlarge","db.m2.2xlarge","db.m2.4xlarge","db.cr1.8xlarge","db.m1.medium","db.m1.large","db.m1.xlarge" ],
              "ConstraintDescription" : "Must contain valid RDS instance type"
@@ -75,19 +75,19 @@
         {
             "Default": "alfresco",
             "Type": "String",
-            "Description": "DB Name for the RDS Aurora database"
+            "Description": "DB Name for the RDS MySQL database"
         },
         "RDSUsername" :
         {
             "Default": "alfresco",
             "Type": "String",
-            "Description": "Username for the RDS Aurora database"
+            "Description": "Username for the RDS MySQL database"
         },
         "RDSPassword" :
         {
             "Default": "alfresco",
             "Type": "String",
-            "Description":"Password for the RDS Aurora database, by default: alfresco",
+            "Description":"Password for the RDS MySQL database, by default: alfresco",
             "NoEcho" :  "TRUE"
         },
          "AlfrescoPassword" :
@@ -98,8 +98,9 @@
         },
         "S3Bucket":
         {
-            "Description" : "Name of the S3 bucket that Alfresco should use to store data. Note: This bucket will be created, enter a unique name",
-            "Type" : "String"
+            "Type": "String",
+            "Default": "your-company-unique-name-alf-12345",
+            "Description" : "Name of the S3 bucket that Alfresco should use to store data. Note: This bucket will be created, enter a unique name"
         }
 
     },
@@ -160,7 +161,7 @@
       "Properties" : {
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "VPC", "CIDR" ]},
         "Tags" : [
-          {"Key" : "Application", "Value" : "Alfresco Cluster behind ELB with S3 for shared storage and RDS (Aurora) for database"  }
+          {"Key" : "Application", "Value" : "Alfresco Cluster behind ELB with S3 for shared storage and RDS (MySQL) for database"  }
         ]
       }
     },
@@ -771,7 +772,7 @@
           "Properties" : {
             "VpcId" : {"Ref" : "VPC"},
             "Tags" : [
-              {"Key" : "Application", "Value" : "RDS Instance (Aurora)"  },
+              {"Key" : "Application", "Value" : "RDS Instance (MySQL)"  },
               {"Key" : "Network", "Value" : "Private" }
             ]
           }
@@ -1021,7 +1022,7 @@
             "DBSecurityGroups" : [ {"Ref" : "RDSSecurityGroup"} ],
             "AllocatedStorage" : "5",
             "DBInstanceClass" : {"Ref" : "RDSInstanceType"},
-            "Engine" : "aurora",
+            "Engine" : "MySQL",
             "MasterUsername" : {"Ref": "RDSUsername"},
             "MasterUserPassword" : {"Ref":"RDSPassword"},
             "DBSubnetGroupName" : {"Ref" : "RDSDBSubnetGroup"},
