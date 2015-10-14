@@ -924,9 +924,16 @@
             },
             "Metadata": {
                 "AWS::CloudFormation::Init": {
-                    "config": {
+                    "configSets": {
+                        "Install": [
+                            "Install"
+                        ]
+                    },
+                    "Install": {
                         "packages": {
-                            "ntp": {}
+                            "yum": {
+                                "ntp": []
+                            }
                         }
                     }
                 }
