@@ -853,6 +853,14 @@
                                 "export SKIP_CHEF_RUN=true",
                                 "export NODE_NAME=allinone",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s",
+                                "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
+                                {
+                                    "Ref": "AWS::ArtifactRepoUsername"
+                                },
+                                "sed -i 's/@@ARTIFACT_REPO_PASSWORD@@/",
+                                {
+                                    "Ref": "AWS::ArtifactRepoPassword"
+                                },
                                 "sed -i 's/@@STACK_NAME@@/",
                                 {
                                     "Ref": "AWS::StackName"
