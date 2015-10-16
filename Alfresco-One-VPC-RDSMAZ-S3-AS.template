@@ -158,7 +158,8 @@
         },
         "AlfrescoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco admin user",
+            "Description": "Password for the Alfresco admin user, default is admin",
+            "Default": "admin",
             "NoEcho": "TRUE"
         },
         "ArtifactRepoUsername": {
@@ -586,6 +587,18 @@
                     },
                     {
                         "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "SubnetConfig",
+                                "VPC",
+                                "CIDR"
+                            ]
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
                         "FromPort": "22",
                         "ToPort": "22",
                         "CidrIp": {
@@ -598,6 +611,12 @@
                         "IpProtocol": "tcp",
                         "FromPort": "80",
                         "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
                         "CidrIp": "0.0.0.0/0"
                     },
                     {
@@ -716,23 +735,33 @@
                                 "CIDR"
                             ]
                         }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "SubnetConfig",
+                                "Alfresco1",
+                                "CIDR"
+                            ]
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "443",
+                        "ToPort": "443",
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "SubnetConfig",
+                                "Alfresco2",
+                                "CIDR"
+                            ]
+                        }
                     }
                 ]
             }
-        },
-        "WaitForAlfrescoInstall": {
-            "Type": "AWS::CloudFormation::WaitCondition",
-            "DependsOn": "AlfrescoInstance",
-            "Properties": {
-                "Handle": {
-                    "Ref": "WaitForAlfrescoInstallWaitHandle"
-                },
-                "Timeout": "1700"
-            }
-        },
-        "WaitForAlfrescoInstallWaitHandle": {
-            "Type": "AWS::CloudFormation::WaitConditionHandle",
-            "Properties": {}
         },
         "AlfrescoInterface": {
             "Type": "AWS::EC2::NetworkInterface",
@@ -812,22 +841,25 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
-                                "export SKIP_CHEF_RUN=true",
-                                "export NODE_NAME=allinone",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s",
+                                "export SKIP_CHEF_RUN=true\n",
+                                "export NODE_NAME=allinone\n",
+                                "mkdir /etc/chef\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/allinone.json > /etc/chef/attributes.json\n",
                                 "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
                                 {
                                     "Ref": "ArtifactRepoUsername"
                                 },
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@ARTIFACT_REPO_PASSWORD@@/",
                                 {
                                     "Ref": "ArtifactRepoPassword"
                                 },
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@STACK_NAME@@/",
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@FQDN@@/",
                                 {
                                     "Fn::GetAtt": [
@@ -835,20 +867,20 @@
                                         "DNSName"
                                     ]
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_ACCESS_KEY@@/",
                                 {
                                     "Ref": "CfnKeys"
                                 },
-                                "/g' /etc/chef/attributes.json",
-                                "sed -i 's/@@AWS_SECRET_KEY@@/",
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's#@@AWS_SECRET_KEY@@#",
                                 {
                                     "Fn::GetAtt": [
                                         "CfnKeys",
                                         "SecretAccessKey"
                                     ]
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "#g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@DB_HOST@@/",
                                 {
                                     "Fn::GetAtt": [
@@ -856,34 +888,35 @@
                                         "Endpoint.Address"
                                     ]
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@DB_NAME@@/",
                                 {
                                     "Ref": "RDSDBName"
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@DB_USERNAME@@/",
                                 {
                                     "Ref": "RDSUsername"
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@DB_PASSWORD@@/",
                                 {
                                     "Ref": "RDSPassword"
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
                                 {
                                     "Ref": "S3BucketName"
                                 },
-                                "/g' /etc/chef/attributes.json",
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_REGION@@/",
                                 {
                                     "Ref": "AWS::Region"
                                 },
-                                "/g' /etc/chef/attributes.json",
-                                "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json",
-                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json"
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
                     }
