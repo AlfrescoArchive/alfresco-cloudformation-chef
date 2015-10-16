@@ -169,7 +169,7 @@
         "ArtifactRepoPassword": {
             "Type": "String",
             "Description": "Password for the Alfresco artifact repository user",
-            "Default": "trialpassword",
+            "Default": "maven-enterprise-trial",
             "NoEcho": "TRUE"
         }
     },
