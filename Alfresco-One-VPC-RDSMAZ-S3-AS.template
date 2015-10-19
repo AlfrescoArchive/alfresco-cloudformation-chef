@@ -164,13 +164,13 @@
         },
         "ArtifactRepoUsername": {
             "Type": "String",
-            "Default": "trialuser",
-            "Description": "Username for the Alfresco artifact repository"
+            "Default": "maven-enterprise-trial",
+            "Description": "Username for the Alfresco artifact repository. Leave this value by default."
         },
         "ArtifactRepoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco artifact repository user",
-            "Default": "maven-enterprise-trial",
+            "Description": "Password for the Alfresco artifact repository user. Leave this value by default.",
+            "Default": "trialuser",
             "NoEcho": "TRUE"
         }
     },
@@ -841,7 +841,6 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
-                                "export SKIP_CHEF_RUN=true\n",
                                 "export NODE_NAME=allinone\n",
                                 "mkdir /etc/chef\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/allinone.json > /etc/chef/attributes.json\n",
@@ -916,6 +915,13 @@
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                "echo [default] > /root/.aws/credentials \n",
+                                "echo region= ",{ "Ref": "AWS::Region" },"  >> /root/.aws/credentials \n",
+                                "echo aws_access_key_id= ",{ "Ref": "CfnKeys" }," >> /root/.aws/credentials \n",
+                                "echo aws_secret_access_key= ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /root/.aws/credentials \n",
+                                "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
+                                "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
+                                "echo $LOCALIP $LOCALNAME >> /etc/hosts\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
@@ -1456,6 +1462,11 @@
                                         "cloudwatch:EnableAlarmActions",
                                         "cloudwatch:PutMetricAlarm"
                                     ],
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "tag:*",
                                     "Resource": "*"
                                 },
                                 {
