@@ -162,6 +162,11 @@
             "Default": "admin",
             "NoEcho": "TRUE"
         },
+        "AlfrescoTrialLicense": {
+            "Type": "String",
+            "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have one, please ask for it to yuor Sales reprensentative or to Alfresco Support via http://support.alfresco.com",
+            "Default": "type a public URL here, i.e. a S3 url with your license"
+        },
         "ArtifactRepoUsername": {
             "Type": "String",
             "Default": "maven-enterprise-trial",
@@ -922,6 +927,9 @@
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                 "echo $LOCALIP $LOCALNAME >> /etc/hosts\n",
+                                "mkdir /opt/alflicense\n",
+                                "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                "chown tomcat:tomcat /opt/alflicense/license.lic\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
