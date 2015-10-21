@@ -733,6 +733,7 @@
                         ]
                     }
                 ],
+                "CrossZone": "true",
                 "HealthCheck": {
                     "Target": {
                         "Fn::Join": [
