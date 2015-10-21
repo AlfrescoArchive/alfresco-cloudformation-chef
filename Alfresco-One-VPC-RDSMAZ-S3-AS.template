@@ -23,7 +23,7 @@
         },
         "AZ1": {
             "Type": "AWS::EC2::AvailabilityZone::Name",
-            "Description": "First availabiltiy zone to deploy into",
+            "Description": "First availabiltiy zone to deploy into. Note: eu-central-1 is not supported yet.",
             "ConstraintDescription": "Must be a valid EC2 Availabilty zone"
         },
         "AZ2": {
@@ -488,6 +488,56 @@
                 }
             }
         },
+        "RecoveryNAT1Alarm": {
+          "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+              "AlarmDescription": "Trigger a recovery when instance NAT1 status check fails for 15 consecutive minutes.",
+              "Namespace": "AWS/EC2" ,
+              "MetricName": "StatusCheckFailed_System",
+              "Statistic": "Minimum",
+              "Period": "60",
+              "EvaluationPeriods": "15",
+              "ComparisonOperator": "GreaterThanThreshold",
+              "Threshold": "0",
+              "AlarmActions": [
+                {
+                  "Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
+                }
+                ],
+              "Dimensions": [
+                {
+                  "Name": "InstanceId","Value": {
+                    "Ref": "NATInstance1"
+                  }
+                  }
+                ]
+            }
+          },
+        "RecoveryNAT2Alarm": {
+          "Type": "AWS::CloudWatch::Alarm",
+            "Properties": {
+              "AlarmDescription": "Trigger a recovery when instance NAT1 status check fails for 15 consecutive minutes.",
+              "Namespace": "AWS/EC2" ,
+              "MetricName": "StatusCheckFailed_System",
+              "Statistic": "Minimum",
+              "Period": "60",
+              "EvaluationPeriods": "15",
+              "ComparisonOperator": "GreaterThanThreshold",
+              "Threshold": "0",
+              "AlarmActions": [
+                {
+                  "Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
+                }
+                ],
+              "Dimensions": [
+                {
+                  "Name": "InstanceId","Value": {
+                    "Ref": "NATInstance2"
+                  }
+                  }
+                ]
+              }
+            },
         "NATEIP1": {
             "Type": "AWS::EC2::EIP",
             "Properties": {
@@ -920,10 +970,11 @@
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                "mkdir /root/.aws/\n",
                                 "echo [default] > /root/.aws/credentials \n",
-                                "echo region= ",{ "Ref": "AWS::Region" },"  >> /root/.aws/credentials \n",
-                                "echo aws_access_key_id= ",{ "Ref": "CfnKeys" }," >> /root/.aws/credentials \n",
-                                "echo aws_secret_access_key= ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /root/.aws/credentials \n",
+                                "echo region = ",{ "Ref": "AWS::Region" },"  >> /root/.aws/credentials \n",
+                                "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /root/.aws/credentials \n",
+                                "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /root/.aws/credentials \n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                 "echo $LOCALIP $LOCALNAME >> /etc/hosts\n",
@@ -1345,12 +1396,26 @@
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": "EC2:Describe*",
+                                    "Action": [
+                                        "ec2:Describe*",
+                                        "ec2:CreateImage",
+                                        "ec2:TerminateInstances",
+                                        "ec2:StopInstances",
+                                        "ec2:RecoverInstances"
+                                    ],
                                     "Resource": "*"
                                 },
                                 {
                                     "Effect": "Allow",
                                     "Action": "cloudwatch:PutMetricData",
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                      "ec2:CreateTags",
+                                      "ec2:DeleteTags"
+                                    ],
                                     "Resource": "*"
                                 },
                                 {
@@ -1433,9 +1498,11 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "EC2:Describe*",
-                                        "EC2:CreateImage",
-                                        "ec2:TerminateInstances"
+                                        "ec2:Describe*",
+                                        "ec2:CreateImage",
+                                        "ec2:TerminateInstances",
+                                        "ec2:StopInstances",
+                                        "ec2:RecoverInstances"
                                     ],
                                     "Resource": "*"
                                 },
@@ -1474,7 +1541,10 @@
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": "tag:*",
+                                    "Action": [
+                                      "ec2:CreateTags",
+                                      "ec2:DeleteTags"
+                                    ],
                                     "Resource": "*"
                                 },
                                 {
@@ -1546,12 +1616,26 @@
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": "EC2:Describe*",
+                                    "Action": [
+                                        "ec2:Describe*",
+                                        "ec2:CreateImage",
+                                        "ec2:TerminateInstances",
+                                        "ec2:StopInstances",
+                                        "ec2:RecoverInstances"
+                                    ],
                                     "Resource": "*"
                                 },
                                 {
                                     "Effect": "Allow",
                                     "Action": "cloudwatch:PutMetricData",
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                      "ec2:CreateTags",
+                                      "ec2:DeleteTags"
+                                    ],
                                     "Resource": "*"
                                 },
                                 {
