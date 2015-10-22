@@ -706,10 +706,10 @@
             "Properties": {
                 "Subnets": [
                     {
-                        "Ref": "NATSubnet1"
+                        "Ref": "NAT1"
                     },
                     {
-                        "Ref": "NATSubnet2"
+                        "Ref": "NAT2"
                     }
                 ],
                 "SecurityGroups": [
@@ -735,16 +735,7 @@
                 ],
                 "CrossZone": "true",
                 "HealthCheck": {
-                    "Target": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "HTTP:",
-                                "80",
-                                "/alfresco"
-                            ]
-                        ]
-                    },
+                    "Target": "TCP:80",
                     "HealthyThreshold": "2",
                     "UnhealthyThreshold": "3",
                     "Interval": "30",
@@ -978,7 +969,8 @@
                                 "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /root/.aws/credentials \n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
-                                "echo $LOCALIP $LOCALNAME >> /etc/hosts\n",
+                                "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
+                                "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                 "mkdir /opt/alflicense\n",
                                 "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
                                 "chown tomcat:tomcat /opt/alflicense/license.lic\n",
@@ -1701,16 +1693,8 @@
                   },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": "8080",
-                        "ToPort": "8080",
-                        "SourceSecurityGroupId": {
-                            "Ref": "ELBSecurityGroup"
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "5800",
-                        "ToPort": "5810",
+                        "FromPort": "5666",
+                        "ToPort": "5666",
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "SubnetConfig",
@@ -1721,8 +1705,8 @@
                     },
                     {
                         "IpProtocol": "tcp",
-                        "FromPort": "5800",
-                        "ToPort": "5810",
+                        "FromPort": "5666",
+                        "ToPort": "5666",
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "SubnetConfig",
