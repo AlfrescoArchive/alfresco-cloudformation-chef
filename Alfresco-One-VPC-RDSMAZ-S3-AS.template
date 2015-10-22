@@ -706,10 +706,10 @@
             "Properties": {
                 "Subnets": [
                     {
-                        "Ref": "NAT1"
+                        "Ref": "AlfrescoSubnet1"
                     },
                     {
-                        "Ref": "NAT2"
+                        "Ref": "AlfrescoSubnet2"
                     }
                 ],
                 "SecurityGroups": [
