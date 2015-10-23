@@ -831,33 +831,31 @@
                 ]
             }
         },
-        "AlfrescoInstance": {
-            "Type": "AWS::EC2::Instance",
+        "AlfrescoASLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Metadata": {
                 "AWS::CloudFormation::Init": {
-                    "configSets": {
-                        "Install": [
-                            "Install"
-                        ]
+                    "config": {
+                      "files" : {
+                        "/tmp/credentials" : {
+                          "content" : { "Fn::Join" : ["", [
+                            "echo [default] > /tmp/credentials \n",
+                            "echo region = ",{ "Ref": "AWS::Region" },"  >> /tmp/credentials \n",
+                            "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /tmp/credentials \n",
+                            "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /tmp/credentials \n",
+                            ]]},
+                            "mode"  : "000644",
+                            "owner" : "root",
+                            "group" : "root"
+                          }
+                        },
                     },
-                    "Install": {
-                        "packages": {
-                            "yum": {
-                                "ntp": []
-                            }
-                        }
+                    "commands": {
+                      "command" : "mkdir /root/.aws && mv /tmp/credentials /root/.aws/credentials",
                     }
                 }
             },
             "Properties": {
-                "NetworkInterfaces": [
-                    {
-                        "NetworkInterfaceId": {
-                            "Ref": "AlfrescoInterface"
-                        },
-                        "DeviceIndex": "0"
-                    }
-                ],
                 "KeyName": {
                     "Ref": "KeyName"
                 },
@@ -870,17 +868,17 @@
                         "AMI"
                     ]
                 },
+                "InstanceMonitoring":"true",
                 "IamInstanceProfile": {
                     "Ref": "SetupRoleProfile"
                 },
                 "InstanceType": {
                     "Ref": "AlfrescoInstanceType"
                 },
-                "BlockDeviceMappings": [
-                    {
-                        "DeviceName": "/dev/sdh",
-                        "VirtualName": "ephemeral0"
-                    }
+                "SecurityGroups":[
+                   {
+                      "Ref":"AlfrescoSecurityGroup"
+                   }
                 ],
                 "UserData": {
                     "Fn::Base64": {
@@ -962,11 +960,6 @@
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
-                                "mkdir /root/.aws/\n",
-                                "echo [default] > /root/.aws/credentials \n",
-                                "echo region = ",{ "Ref": "AWS::Region" },"  >> /root/.aws/credentials \n",
-                                "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /root/.aws/credentials \n",
-                                "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /root/.aws/credentials \n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                 "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
@@ -980,6 +973,141 @@
                     }
                   }
                 }
+            },
+        "AlfrescoScaleUpPolicy":{
+               "Type":"AWS::AutoScaling::ScalingPolicy",
+               "Properties":{
+                  "AdjustmentType":"ChangeInCapacity",
+                  "AutoScalingGroupName":{
+                     "Ref":"AlfrescoAutoScalingGroup"
+                  },
+                  "Cooldown":"60",
+                  "ScalingAdjustment":"1"
+               }
+            },
+        "AlfrescoScaleDownPolicy":{
+               "Type":"AWS::AutoScaling::ScalingPolicy",
+               "Properties":{
+                  "AdjustmentType":"ChangeInCapacity",
+                  "AutoScalingGroupName":{
+                     "Ref":"AlfrescoAutoScalingGroup"
+                  },
+                  "Cooldown":"60",
+                  "ScalingAdjustment":"-1"
+               }
+            },
+        "CPUAlarmHigh":{
+               "Type":"AWS::CloudWatch::Alarm",
+               "Properties":{
+                  "AlarmDescription":"Scale-up if CPU > 60% for 2 minutes",
+                  "MetricName":"CPUUtilization",
+                  "Namespace":"AWS/EC2",
+                  "Statistic":"Average",
+                  "Period":"60",
+                  "EvaluationPeriods":"2",
+                  "Threshold":"60",
+                  "AlarmActions":[
+                     {
+                        "Ref":"AlfrescoScaleUpPolicy"
+                     }
+                  ],
+                  "Dimensions":[
+                     {
+                        "Name":"AutoScalingGroupName",
+                        "Value":{
+                           "Ref":"AlfrescoAutoScalingGroup"
+                        }
+                     }
+                  ],
+                  "ComparisonOperator":"GreaterThanThreshold"
+               }
+            },
+        "CPUAlarmLow":{
+               "Type":"AWS::CloudWatch::Alarm",
+               "Properties":{
+                  "AlarmDescription":"Scale-down if CPU < 40% for 180 minutes",
+                  "MetricName":"CPUUtilization",
+                  "Namespace":"AWS/EC2",
+                  "Statistic":"Average",
+                  "Period":"60",
+                  "EvaluationPeriods":"180",
+                  "Threshold":"40",
+                  "AlarmActions":[
+                     {
+                        "Ref":"AlfrescoScaleDownPolicy"
+                     }
+                  ],
+                  "Dimensions":[
+                     {
+                        "Name":"AutoScalingGroupName",
+                        "Value":{
+                           "Ref":"AlfrescoAutoScalingGroup"
+                        }
+                     }
+                  ],
+                  "ComparisonOperator":"LessThanThreshold"
+               }
+            },
+        "AlfrescoAutoScalingSNSTopic":{
+               "Type":"AWS::SNS::Topic",
+               "Properties":{
+                  "Subscription":[
+                     {
+                        "Endpoint":{
+                           "Ref":"OperatorEMail"
+                        },
+                        "Protocol":"Email"
+                     }
+                  ]
+               }
+            },
+        "AlfrescoAutoScalingGroup":{
+               "Type":"AWS::AutoScaling::AutoScalingGroup",
+               "Properties":{
+                  "AvailabilityZones": [ {
+                    "Ref":"AZ1",
+                    "Ref":"AZ2"
+                  }
+                ],
+                  "VPCZoneIdentifier": [ {
+                    "Ref":"AlfrescoSubnet1",
+                    "Ref":"AlfrescoSubnet2"
+                  }
+                ],
+                  "Cooldown":"9000",
+                  "DesiredCapacity":"1",
+                  "HealthCheckGracePeriod":"300",
+                  "HealthCheckType":"ELB",
+                  "LaunchConfigurationName":{
+                     "Ref":"AlfrescoASLaunchConfig"
+                  },
+                  "LoadBalancerNames":[
+                     {
+                        "Ref":"ElasticLoadBalancer"
+                     }
+                  ],
+                  "MaxSize":"4",
+                  "MinSize":"1",
+                  "NotificationConfiguration":{
+                     "TopicARN":{
+                        "Ref":"AlfrescoAutoScalingSNSTopic"
+                     },
+                     "NotificationTypes":[
+                        "autoscaling:EC2_INSTANCE_LAUNCH",
+                        "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+                        "autoscaling:EC2_INSTANCE_TERMINATE",
+                        "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+                        "autoscaling:TEST_NOTIFICATION"
+                     ]
+                  },
+                  "Tags":[
+                     {
+                        "Key":"Name",
+                        "Value":"Alfresco Server cluster node",
+                        "PropagateAtLaunch":"true"
+                     }
+                  ]
+               }
             },
         "RDSSubnet1": {
           "Type": "AWS::EC2::Subnet",
@@ -1617,6 +1745,11 @@
                                         "ec2:RecoverInstances"
                                     ],
                                     "Resource": "*"
+                                },
+                                {
+                                   "Effect":"Allow",
+                                   "Action":"elasticloadbalancing:DescribeInstanceHealth",
+                                   "Resource":"*"
                                 },
                                 {
                                     "Effect": "Allow",
