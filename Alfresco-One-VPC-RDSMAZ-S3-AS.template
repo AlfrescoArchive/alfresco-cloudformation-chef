@@ -164,7 +164,7 @@
         },
         "AlfrescoTrialLicense": {
             "Type": "String",
-            "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have one, please ask for it to yuor Sales reprensentative or to Alfresco Support via http://support.alfresco.com",
+            "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have one, please ask for it to your Sales representative or to Alfresco Support via http://support.alfresco.com",
             "Default": "type a public URL here, i.e. a S3 url with your license"
         },
         "ArtifactRepoUsername": {
@@ -184,11 +184,11 @@
             "us-east-1": {
                 "AMI": "ami-96a818fe"
             },
-            "us-west-2": {
-                "AMI": "ami-c7d092f7"
-            },
             "us-west-1": {
                 "AMI": "ami-6bcfc42e"
+            },
+            "us-west-2": {
+                "AMI": "ami-c7d092f7"
             },
             "eu-west-1": {
                 "AMI": "ami-e4ff5c93"
@@ -213,11 +213,11 @@
             "us-east-1": {
                 "AMI": "ami-4c9e4b24"
             },
-            "us-west-2": {
-                "AMI": "ami-bb69128b"
-            },
             "us-west-1": {
                 "AMI": "ami-2b2b296e"
+            },
+            "us-west-2": {
+                "AMI": "ami-bb69128b"
             },
             "eu-west-1": {
                 "AMI": "ami-3760b040"
@@ -420,74 +420,6 @@
                 }
             }
         },
-        "NATInstance1": {
-            "Type": "AWS::EC2::Instance",
-            "Properties": {
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "NAT Instance"
-                    }
-                ],
-                "InstanceType": {
-                    "Ref": "NATInstanceType"
-                },
-                "KeyName": {
-                    "Ref": "KeyName"
-                },
-                "NetworkInterfaces": [
-                    {
-                        "NetworkInterfaceId": {
-                            "Ref": "NATInterface1"
-                        },
-                        "DeviceIndex": "0"
-                    }
-                ],
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSNATAMI",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
-                }
-            }
-        },
-        "NATInstance2": {
-            "Type": "AWS::EC2::Instance",
-            "Properties": {
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": "NAT Instance"
-                    }
-                ],
-                "InstanceType": {
-                    "Ref": "NATInstanceType"
-                },
-                "KeyName": {
-                    "Ref": "KeyName"
-                },
-                "NetworkInterfaces": [
-                    {
-                        "NetworkInterfaceId": {
-                            "Ref": "NATInterface2"
-                        },
-                        "DeviceIndex": "0"
-                    }
-                ],
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "AWSNATAMI",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
-                }
-            }
-        },
         "RecoveryNAT1Alarm": {
           "Type": "AWS::CloudWatch::Alarm",
             "Properties": {
@@ -548,6 +480,51 @@
             "Type": "AWS::EC2::EIP",
             "Properties": {
                 "Domain": "vpc"
+            }
+        },
+        "NATSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Enable internal access to the NAT device",
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "SecurityGroupIngress": [
+                    {
+                        "IpProtocol": "tcp", "FromPort": "22", "ToPort": "22",
+                        "CidrIp": { "Ref": "SSHFrom" }
+                    },
+                    {
+                        "IpProtocol": "tcp", "FromPort": "80", "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp", "FromPort": "443", "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "tcp", "FromPort": "80", "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp", "FromPort": "443", "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
+                    },
+                    {
+                        "IpProtocol": "tcp",  "FromPort": "22",  "ToPort": "22",
+                        "CidrIp": {
+                            "Fn::FindInMap": [ "SubnetConfig", "Alfresco2", "CIDR" ]
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp", "FromPort": "22", "ToPort": "22",
+                        "CidrIp": {
+                            "Fn::FindInMap": [ "SubnetConfig", "Alfresco1", "CIDR" ]
+                        }
+                    }
+                ]
             }
         },
         "NATInterface1": {
@@ -620,83 +597,96 @@
                 }
             }
         },
-        "NATSecurityGroup": {
+        "NATInstance1": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "NAT Instance"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "NATInstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "NetworkInterfaces": [
+                    {
+                        "NetworkInterfaceId": {
+                            "Ref": "NATInterface1"
+                        },
+                        "DeviceIndex": "0"
+                    }
+                ],
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSNATAMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMI"
+                    ]
+                }
+            }
+        },
+        "NATInstance2": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "NAT Instance"
+                    }
+                ],
+                "InstanceType": {
+                    "Ref": "NATInstanceType"
+                },
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "NetworkInterfaces": [
+                    {
+                        "NetworkInterfaceId": {
+                            "Ref": "NATInterface2"
+                        },
+                        "DeviceIndex": "0"
+                    }
+                ],
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSNATAMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMI"
+                    ]
+                }
+            }
+        },
+        "ELBSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupDescription": "Enable internal access to the NAT device",
+                "GroupDescription": "Allow access to the ELB",
                 "VpcId": {
                     "Ref": "VPC"
                 },
                 "SecurityGroupIngress": [
                     {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "VPC",
-                                "CIDR"
-                            ]
-                        }
+                        "IpProtocol": "tcp", "FromPort": "80", "ToPort": "80",
+                        "CidrIp": "0.0.0.0/0"
                     },
                     {
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "VPC",
-                                "CIDR"
-                            ]
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "CidrIp": {
-                            "Ref": "SSHFrom"
-                        }
+                        "IpProtocol": "tcp", "FromPort": "443", "ToPort": "443",
+                        "CidrIp": "0.0.0.0/0"
                     }
+
                 ],
                 "SecurityGroupEgress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "CidrIp": "0.0.0.0/0"
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco2",
-                                "CIDR"
-                            ]
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "22",
-                        "ToPort": "22",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco1",
-                                "CIDR"
-                            ]
-                        }
+                  {
+                    "IpProtocol": "tcp", "FromPort": "0", "ToPort": "65535",
+                    "CidrIp": "0.0.0.0/0"
                     }
                 ]
             }
@@ -720,7 +710,7 @@
                 "AppCookieStickinessPolicy": [
                     {
                         "CookieName": "jsessionid",
-                        "PolicyName": "AlfrescoCluster"
+                        "PolicyName": "AlfrescoSetup"
                     }
                 ],
                 "Listeners": [
@@ -729,7 +719,7 @@
                         "InstancePort": "80",
                         "Protocol": "HTTP",
                         "PolicyNames": [
-                            "AlfrescoCluster"
+                            "AlfrescoSetup"
                         ]
                     }
                 ],
@@ -740,428 +730,6 @@
                     "UnhealthyThreshold": "3",
                     "Interval": "30",
                     "Timeout": "3"
-                }
-            }
-        },
-        "ELBSecurityGroup": {
-            "Type": "AWS::EC2::SecurityGroup",
-            "Properties": {
-                "GroupDescription": "Allow access to the ELB",
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "SecurityGroupIngress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": "0.0.0.0/0"
-                    }
-                ],
-                "SecurityGroupEgress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco1",
-                                "CIDR"
-                            ]
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "80",
-                        "ToPort": "80",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco2",
-                                "CIDR"
-                            ]
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco1",
-                                "CIDR"
-                            ]
-                        }
-                    },
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "443",
-                        "ToPort": "443",
-                        "CidrIp": {
-                            "Fn::FindInMap": [
-                                "SubnetConfig",
-                                "Alfresco2",
-                                "CIDR"
-                            ]
-                        }
-                    }
-                ]
-            }
-        },
-        "AlfrescoInterface": {
-            "Type": "AWS::EC2::NetworkInterface",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet1"
-                },
-                "Description": "External interface for Alfresco server",
-                "GroupSet": [
-                    {
-                        "Ref": "AlfrescoSecurityGroup"
-                    }
-                ],
-                "SourceDestCheck": "true",
-                "Tags": [
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    }
-                ]
-            }
-        },
-        "AlfrescoASLaunchConfig": {
-            "Type": "AWS::AutoScaling::LaunchConfiguration",
-            "Metadata": {
-                "AWS::CloudFormation::Init": {
-                    "config": {
-                      "files" : {
-                        "/tmp/credentials" : {
-                          "content" : { "Fn::Join" : ["", [
-                            "echo [default] > /tmp/credentials \n",
-                            "echo region = ",{ "Ref": "AWS::Region" },"  >> /tmp/credentials \n",
-                            "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /tmp/credentials \n",
-                            "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /tmp/credentials \n",
-                            ]]},
-                            "mode"  : "000644",
-                            "owner" : "root",
-                            "group" : "root"
-                          }
-                        },
-                    },
-                    "commands": {
-                      "command" : "mkdir /root/.aws && mv /tmp/credentials /root/.aws/credentials",
-                    }
-                }
-            },
-            "Properties": {
-                "KeyName": {
-                    "Ref": "KeyName"
-                },
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "ALINUXAMI",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
-                },
-                "InstanceMonitoring":"true",
-                "IamInstanceProfile": {
-                    "Ref": "SetupRoleProfile"
-                },
-                "InstanceType": {
-                    "Ref": "AlfrescoInstanceType"
-                },
-                "SecurityGroups":[
-                   {
-                      "Ref":"AlfrescoSecurityGroup"
-                   }
-                ],
-                "UserData": {
-                    "Fn::Base64": {
-                        "Fn::Join": [
-                            "",
-                            [
-                                "#!/bin/bash -v\n",
-                                "export NODE_NAME=allinone\n",
-                                "mkdir /etc/chef\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/allinone.json > /etc/chef/attributes.json\n",
-                                "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
-                                {
-                                    "Ref": "ArtifactRepoUsername"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@ARTIFACT_REPO_PASSWORD@@/",
-                                {
-                                    "Ref": "ArtifactRepoPassword"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@STACK_NAME@@/",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@FQDN@@/",
-                                {
-                                    "Fn::GetAtt": [
-                                        "ElasticLoadBalancer",
-                                        "DNSName"
-                                    ]
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@AWS_ACCESS_KEY@@/",
-                                {
-                                    "Ref": "CfnKeys"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's#@@AWS_SECRET_KEY@@#",
-                                {
-                                    "Fn::GetAtt": [
-                                        "CfnKeys",
-                                        "SecretAccessKey"
-                                    ]
-                                },
-                                "#g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@DB_HOST@@/",
-                                {
-                                    "Fn::GetAtt": [
-                                        "RDSDBInstance",
-                                        "Endpoint.Address"
-                                    ]
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@DB_NAME@@/",
-                                {
-                                    "Ref": "RDSDBName"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@DB_USERNAME@@/",
-                                {
-                                    "Ref": "RDSUsername"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@DB_PASSWORD@@/",
-                                {
-                                    "Ref": "RDSPassword"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
-                                {
-                                    "Ref": "S3BucketName"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@AWS_REGION@@/",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
-                                "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
-                                "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
-                                "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
-                                "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
-                                "mkdir /opt/alflicense\n",
-                                "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
-                                "chown tomcat:tomcat /opt/alflicense/license.lic\n",
-                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
-                            ]
-                        ]
-                    }
-                  }
-                }
-            },
-        "AlfrescoScaleUpPolicy":{
-               "Type":"AWS::AutoScaling::ScalingPolicy",
-               "Properties":{
-                  "AdjustmentType":"ChangeInCapacity",
-                  "AutoScalingGroupName":{
-                     "Ref":"AlfrescoAutoScalingGroup"
-                  },
-                  "Cooldown":"60",
-                  "ScalingAdjustment":"1"
-               }
-            },
-        "AlfrescoScaleDownPolicy":{
-               "Type":"AWS::AutoScaling::ScalingPolicy",
-               "Properties":{
-                  "AdjustmentType":"ChangeInCapacity",
-                  "AutoScalingGroupName":{
-                     "Ref":"AlfrescoAutoScalingGroup"
-                  },
-                  "Cooldown":"60",
-                  "ScalingAdjustment":"-1"
-               }
-            },
-        "CPUAlarmHigh":{
-               "Type":"AWS::CloudWatch::Alarm",
-               "Properties":{
-                  "AlarmDescription":"Scale-up if CPU > 60% for 2 minutes",
-                  "MetricName":"CPUUtilization",
-                  "Namespace":"AWS/EC2",
-                  "Statistic":"Average",
-                  "Period":"60",
-                  "EvaluationPeriods":"2",
-                  "Threshold":"60",
-                  "AlarmActions":[
-                     {
-                        "Ref":"AlfrescoScaleUpPolicy"
-                     }
-                  ],
-                  "Dimensions":[
-                     {
-                        "Name":"AutoScalingGroupName",
-                        "Value":{
-                           "Ref":"AlfrescoAutoScalingGroup"
-                        }
-                     }
-                  ],
-                  "ComparisonOperator":"GreaterThanThreshold"
-               }
-            },
-        "CPUAlarmLow":{
-               "Type":"AWS::CloudWatch::Alarm",
-               "Properties":{
-                  "AlarmDescription":"Scale-down if CPU < 40% for 180 minutes",
-                  "MetricName":"CPUUtilization",
-                  "Namespace":"AWS/EC2",
-                  "Statistic":"Average",
-                  "Period":"60",
-                  "EvaluationPeriods":"180",
-                  "Threshold":"40",
-                  "AlarmActions":[
-                     {
-                        "Ref":"AlfrescoScaleDownPolicy"
-                     }
-                  ],
-                  "Dimensions":[
-                     {
-                        "Name":"AutoScalingGroupName",
-                        "Value":{
-                           "Ref":"AlfrescoAutoScalingGroup"
-                        }
-                     }
-                  ],
-                  "ComparisonOperator":"LessThanThreshold"
-               }
-            },
-        "AlfrescoAutoScalingSNSTopic":{
-               "Type":"AWS::SNS::Topic",
-               "Properties":{
-                  "Subscription":[
-                     {
-                        "Endpoint":{
-                           "Ref":"OperatorEMail"
-                        },
-                        "Protocol":"Email"
-                     }
-                  ]
-               }
-            },
-        "AlfrescoAutoScalingGroup":{
-               "Type":"AWS::AutoScaling::AutoScalingGroup",
-               "Properties":{
-                  "AvailabilityZones": [ {
-                    "Ref":"AZ1",
-                    "Ref":"AZ2"
-                  }
-                ],
-                  "VPCZoneIdentifier": [ {
-                    "Ref":"AlfrescoSubnet1",
-                    "Ref":"AlfrescoSubnet2"
-                  }
-                ],
-                  "Cooldown":"9000",
-                  "DesiredCapacity":"1",
-                  "HealthCheckGracePeriod":"300",
-                  "HealthCheckType":"ELB",
-                  "LaunchConfigurationName":{
-                     "Ref":"AlfrescoASLaunchConfig"
-                  },
-                  "LoadBalancerNames":[
-                     {
-                        "Ref":"ElasticLoadBalancer"
-                     }
-                  ],
-                  "MaxSize":"4",
-                  "MinSize":"1",
-                  "NotificationConfiguration":{
-                     "TopicARN":{
-                        "Ref":"AlfrescoAutoScalingSNSTopic"
-                     },
-                     "NotificationTypes":[
-                        "autoscaling:EC2_INSTANCE_LAUNCH",
-                        "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
-                        "autoscaling:EC2_INSTANCE_TERMINATE",
-                        "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
-                        "autoscaling:TEST_NOTIFICATION"
-                     ]
-                  },
-                  "Tags":[
-                     {
-                        "Key":"Name",
-                        "Value":"Alfresco Server cluster node",
-                        "PropagateAtLaunch":"true"
-                     }
-                  ]
-               }
-            },
-        "RDSSubnet1": {
-          "Type": "AWS::EC2::Subnet",
-            "Properties": {
-              "VpcId": {
-                "Ref": "VPC"
-            },
-              "CidrBlock": {
-                "Fn::FindInMap": [
-                    "SubnetConfig",
-                    "RDS1",
-                    "CIDR"
-                ]
-            },
-              "Tags": [
-                {
-                    "Key": "Application",
-                    "Value": "RDS"
-                },
-                {
-                    "Key": "Network",
-                    "Value": "Private"
-                }
-            ],
-              "AvailabilityZone": {
-                "Ref": "AZ1"
-            }
-          }
-        },
-        "RDSSubnet2": {
-            "Type": "AWS::EC2::Subnet",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "CidrBlock": {
-                    "Fn::FindInMap": [
-                        "SubnetConfig",
-                        "RDS2",
-                        "CIDR"
-                    ]
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": "RDS"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    }
-                ],
-                "AvailabilityZone": {
-                    "Ref": "AZ2"
                 }
             }
         },
@@ -1243,46 +811,6 @@
                 }
             }
         },
-        "PublicNetworkAcl": {
-            "Type": "AWS::EC2::NetworkAcl",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": "ELB and NAT Instance"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Public"
-                    }
-                ]
-            }
-        },
-        "PublicSubnetRouteTableAssociation1": {
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "NATSubnet1"
-                },
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                }
-            }
-        },
-        "PublicSubnetRouteTableAssociation2": {
-            "Type": "AWS::EC2::SubnetRouteTableAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "NATSubnet2"
-                },
-                "RouteTableId": {
-                    "Ref": "PublicRouteTable"
-                }
-            }
-        },
         "AlfrescoSubnetRouteTableAssociation1": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
@@ -1297,90 +825,22 @@
         "AlfrescoSubnetRouteTableAssociation2": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet2"
-                },
-                "RouteTableId": {
-                    "Ref": "AlfrescoRouteTable2"
-                }
+                "SubnetId": { "Ref": "AlfrescoSubnet2" },
+                "RouteTableId": { "Ref": "AlfrescoRouteTable2" }
             }
         },
-        "InboundPublicNetworkAclEntry": {
-            "Type": "AWS::EC2::NetworkAclEntry",
+        "PublicSubnetRouteTableAssociation1": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                },
-                "RuleNumber": "100",
-                "Protocol": "6",
-                "RuleAction": "allow",
-                "Egress": "false",
-                "CidrBlock": "0.0.0.0/0",
-                "PortRange": {
-                    "From": "0",
-                    "To": "65535"
-                }
+                "SubnetId": { "Ref": "NATSubnet1" },
+                "RouteTableId": { "Ref": "PublicRouteTable" }
             }
         },
-        "OutBoundPublicNetworkAclEntry": {
-            "Type": "AWS::EC2::NetworkAclEntry",
+        "PublicSubnetRouteTableAssociation2": {
+            "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                },
-                "RuleNumber": "101",
-                "Protocol": "6",
-                "RuleAction": "allow",
-                "Egress": "true",
-                "CidrBlock": "0.0.0.0/0",
-                "PortRange": {
-                    "From": "0",
-                    "To": "65535"
-                }
-            }
-        },
-        "AlfrescoSubnetNetworkAclAssociation1": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet1"
-                },
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                }
-            }
-        },
-        "AlfrescoSubnetNetworkAclAssociation2": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet2"
-                },
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                }
-            }
-        },
-        "PublicSubnetNetworkAclAssociation1": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "NATSubnet1"
-                },
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                }
-            }
-        },
-        "PublicSubnetNetworkAclAssociation2": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "NATSubnet2"
-                },
-                "NetworkAclId": {
-                    "Ref": "PublicNetworkAcl"
-                }
+                "SubnetId": { "Ref": "NATSubnet2" },
+                "RouteTableId": { "Ref": "PublicRouteTable" }
             }
         },
         "RDSNetworkAcl": {
@@ -1486,105 +946,62 @@
                 }
             }
         },
-        "AlfrescoRole": {
-            "Type": "AWS::IAM::Role",
+        "PublicNetworkAcl": {
+            "Type": "AWS::EC2::NetworkAcl",
             "Properties": {
-                "AssumeRolePolicyDocument": {
-                    "Statement": [
-                        {
-                            "Effect": "Allow",
-                            "Principal": {
-                                "Service": [
-                                    "ec2.amazonaws.com"
-                                ]
-                            },
-                            "Action": [
-                                "sts:AssumeRole"
-                            ]
-                        }
-                    ]
-                },
-                "Path": "/",
-                "Policies": [
-                    {
-                        "PolicyName": "AlfrescoCluster",
-                        "PolicyDocument": {
-                            "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": "cloudformation:DescribeStackResource",
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:Describe*",
-                                        "ec2:CreateImage",
-                                        "ec2:TerminateInstances",
-                                        "ec2:StopInstances",
-                                        "ec2:RecoverInstances"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": "cloudwatch:PutMetricData",
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                      "ec2:CreateTags",
-                                      "ec2:DeleteTags"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject",
-                                        "s3:PutObject",
-                                        "s3:DeleteObject",
-                                        "s3:ListBucket",
-                                        "s3:Get*",
-                                        "s3:CreateBucket",
-                                        "s3:List*"
-                                    ],
-                                    "Resource": {
-                                        "Fn::Join": [
-                                            "",
-                                            [
-                                                "arn:aws:s3:::",
-                                                {
-                                                    "Ref": "S3Bucket"
-                                                },
-                                                "/*"
-                                            ]
-                                        ]
-                                    }
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:List*"
-                                    ],
-                                    "Resource": "*"
-                                }
-                            ]
-                        }
-                    }
+                "VpcId": { "Ref": "VPC" },
+                "Tags": [
+                    { "Key": "Application", "Value": "ELB and NAT Instance" },
+                    { "Key": "Network", "Value": "Public" }
                 ]
             }
         },
-        "AlfrescoRoleProfile": {
-            "Type": "AWS::IAM::InstanceProfile",
+        "InboundPublicNetworkAclEntry": {
+            "Type": "AWS::EC2::NetworkAclEntry",
             "Properties": {
-                "Path": "/",
-                "Roles": [
-                    {
-                        "Ref": "AlfrescoRole"
-                    }
-                ]
+                "NetworkAclId": { "Ref": "PublicNetworkAcl" },
+                "RuleNumber": "100", "Protocol": "6",
+                "RuleAction": "allow", "Egress": "false",
+                "CidrBlock": "0.0.0.0/0",
+                "PortRange": { "From": "0", "To": "65535" }
+            }
+        },
+        "OutBoundPublicNetworkAclEntry": {
+            "Type": "AWS::EC2::NetworkAclEntry",
+            "Properties": {
+                "NetworkAclId": { "Ref": "PublicNetworkAcl" },
+                "RuleNumber": "100", "Protocol": "6",
+                "RuleAction": "allow", "Egress": "true",
+                "CidrBlock": "0.0.0.0/0",
+                "PortRange": { "From": "0", "To": "65535" }
+            }
+        },
+        "AlfrescoSubnetNetworkAclAssociation1": {
+            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties": {
+                "SubnetId": { "Ref": "AlfrescoSubnet1" },
+                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
+            }
+        },
+        "AlfrescoSubnetNetworkAclAssociation2": {
+            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties": {
+                "SubnetId": { "Ref": "AlfrescoSubnet2" },
+                "NetworkAclId": { "Ref": "PublicNetworkAcl"  }
+            }
+        },
+        "PublicSubnetNetworkAclAssociation1": {
+            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties": {
+                "SubnetId": { "Ref": "NATSubnet1" },
+                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
+            }
+        },
+        "PublicSubnetNetworkAclAssociation2": {
+            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+            "Properties": {
+                "SubnetId": { "Ref": "NATSubnet2" },
+                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
             }
         },
         "SetupRole": {
@@ -1618,38 +1035,22 @@
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:Describe*",
-                                        "ec2:CreateImage",
-                                        "ec2:TerminateInstances",
-                                        "ec2:StopInstances",
-                                        "ec2:RecoverInstances"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": "elasticloadbalancing:DescribeLoadBalancers",
+                                    "Action": "elasticloadbalancing:*",
                                     "Resource": "*"
                                 },
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "autoscaling:create*",
-                                        "autoscaling:put*",
-                                        "autoscaling:DescribePolicies"
+                                        "autoscaling:*"
                                     ],
                                     "Resource": "*"
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": "iam:PassRole",
-                                    "Resource": {
-                                        "Fn::GetAtt": [
-                                            "AlfrescoRole",
-                                            "Arn"
-                                        ]
-                                    }
+                                    "Action": [
+                                      "ec2:*"
+                                    ],
+                                    "Resource": "*"
                                 },
                                 {
                                     "Effect": "Allow",
@@ -1663,20 +1064,7 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                      "ec2:CreateTags",
-                                      "ec2:DeleteTags"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject",
-                                        "s3:PutObject",
-                                        "s3:DeleteObject",
-                                        "s3:ListBucket",
-                                        "s3:Get*",
-                                        "s3:List*"
+                                        "s3:*"
                                     ],
                                     "Resource": {
                                         "Fn::Join": [
@@ -1690,13 +1078,6 @@
                                             ]
                                         ]
                                     }
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:List*"
-                                    ],
-                                    "Resource": "*"
                                 }
                             ]
                         }
@@ -1715,13 +1096,6 @@
                 ]
             }
         },
-        "S3Bucket":{
-            "Type" : "AWS::S3::Bucket",
-            "Properties": {
-              "BucketName": {"Ref":"S3BucketName"},
-              "AccessControl": "BucketOwnerFullControl"
-            }
-        },
         "AlfrescoUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
@@ -1730,70 +1104,57 @@
                         "PolicyName": "cfn-and-s3",
                         "PolicyDocument": {
                             "Statement": [
-                                {
-                                    "Effect": "Allow",
-                                    "Action": "cloudformation:DescribeStackResource",
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:Describe*",
-                                        "ec2:CreateImage",
-                                        "ec2:TerminateInstances",
-                                        "ec2:StopInstances",
-                                        "ec2:RecoverInstances"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                   "Effect":"Allow",
-                                   "Action":"elasticloadbalancing:DescribeInstanceHealth",
-                                   "Resource":"*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": "cloudwatch:PutMetricData",
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                      "ec2:CreateTags",
-                                      "ec2:DeleteTags"
-                                    ],
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:GetObject",
-                                        "s3:PutObject",
-                                        "s3:DeleteObject",
-                                        "s3:ListBucket",
-                                        "s3:Get*",
-                                        "s3:List*"
-                                    ],
-                                    "Resource": {
-                                        "Fn::Join": [
-                                            "",
-                                            [
-                                                "arn:aws:s3:::",
-                                                {
-                                                    "Ref": "S3Bucket"
-                                                },
-                                                "/*"
-                                            ]
-                                        ]
-                                    }
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "s3:List*"
-                                    ],
-                                    "Resource": "*"
-                                }
+                              {
+                                  "Effect": "Allow",
+                                  "Action": "cloudformation:DescribeStackResource",
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": "elasticloadbalancing:*",
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "autoscaling:*"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                    "ec2:*"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "cloudwatch:PutMetricData",
+                                      "cloudwatch:EnableAlarmActions",
+                                      "cloudwatch:PutMetricAlarm"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "s3:*"
+                                  ],
+                                  "Resource": {
+                                      "Fn::Join": [
+                                          "",
+                                          [
+                                              "arn:aws:s3:::",
+                                              {
+                                                  "Ref": "S3Bucket"
+                                              },
+                                              "/*"
+                                          ]
+                                      ]
+                                  }
+                              }
                             ]
                         }
                     }
@@ -1808,6 +1169,755 @@
                 }
             }
         },
+        "RDSDBSubnetGroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": "description",
+                "SubnetIds": [
+                    {
+                        "Ref": "RDSSubnet1"
+                    },
+                    {
+                        "Ref": "RDSSubnet2"
+                    }
+                ]
+            }
+        },
+        "RDSSecurityGroup": {
+            "Type": "AWS::RDS::DBSecurityGroup",
+            "Properties": {
+                "EC2VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "Allow AlfrescoSecurityGroup access to RDS DB",
+                "DBSecurityGroupIngress": [
+                    {
+                        "EC2SecurityGroupId": {
+                            "Ref": "AlfrescoSecurityGroup"
+                        }
+                    }
+                ]
+            }
+        },
+        "RDSDBInstance": {
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                "MultiAZ": "true",
+                "DBSecurityGroups": [
+                    {
+                        "Ref": "RDSSecurityGroup"
+                    }
+                ],
+                "AllocatedStorage": "5",
+                "DBInstanceClass": {
+                    "Ref": "RDSInstanceType"
+                },
+                "Engine": "MySQL",
+                "MasterUsername": {
+                    "Ref": "RDSUsername"
+                },
+                "MasterUserPassword": {
+                    "Ref": "RDSPassword"
+                },
+                "DBSubnetGroupName": {
+                    "Ref": "RDSDBSubnetGroup"
+                },
+                "DBName": {
+                    "Ref": "RDSDBName"
+                }
+            },
+            "DeletionPolicy": "Snapshot"
+        },
+        "AlfrescoInterface": {
+            "Type": "AWS::EC2::NetworkInterface",
+            "Properties": {
+                "SubnetId": {
+                    "Ref": "AlfrescoSubnet1"
+                },
+                "Description": "External interface for Alfresco server",
+                "GroupSet": [
+                    {
+                        "Ref": "AlfrescoSecurityGroup"
+                    }
+                ],
+                "SourceDestCheck": "true",
+                "Tags": [
+                    {
+                        "Key": "Network",
+                        "Value": "Private"
+                    }
+                ]
+            }
+        },
+        "AlfrescoASLaunchConfig": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "config": {
+                      "files":{
+                        "/root/.awssecret":{
+                            "content":{
+                               "Fn::Join":[
+                                  "",
+                                  [
+                                     "[default]\n",
+                                     "aws_access_key_id = ",
+                                     {
+                                        "Ref":"CfnKeys"
+                                     },
+                                     "\n",
+                                     "aws_secret_access_key = ",
+                                     {
+                                        "Fn::GetAtt":[
+                                           "CfnKeys",
+                                           "SecretAccessKey"
+                                        ]
+                                     },
+                                     "\n",
+                                     "region = ",
+                                     {
+                                        "Ref":"AWS::Region"
+                                     },
+                                     "\n"
+                                  ]
+                               ]
+                            },
+                            "mode":"000600",
+                            "owner":"root",
+                            "group":"root"
+                         }
+                      },
+                      "commands":{
+                         "00make_aws_dir":{
+                            "command":[
+                               "mkdir",
+                               "/root/.aws"
+                            ]
+                         }
+                    }
+                }
+              }
+            },
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyName"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "ALINUXAMI",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "AMI"
+                    ]
+                },
+                "InstanceMonitoring":"true",
+                "IamInstanceProfile": {
+                    "Ref": "SetupRoleProfile"
+                },
+                "InstanceType": {
+                    "Ref": "AlfrescoInstanceType"
+                },
+                "SecurityGroups":[
+                   {
+                      "Ref":"AlfrescoSecurityGroup"
+                   }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -v\n",
+                                "export NODE_NAME=allinone\n",
+                                "mkdir /etc/chef\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/allinone.json > /etc/chef/attributes.json\n",
+                                "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
+                                {
+                                    "Ref": "ArtifactRepoUsername"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@ARTIFACT_REPO_PASSWORD@@/",
+                                {
+                                    "Ref": "ArtifactRepoPassword"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@STACK_NAME@@/",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@FQDN@@/",
+                                {
+                                    "Fn::GetAtt": [
+                                        "ElasticLoadBalancer",
+                                        "DNSName"
+                                    ]
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@AWS_ACCESS_KEY@@/",
+                                {
+                                    "Ref": "CfnKeys"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's#@@AWS_SECRET_KEY@@#",
+                                {
+                                    "Fn::GetAtt": [
+                                        "CfnKeys",
+                                        "SecretAccessKey"
+                                    ]
+                                },
+                                "#g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@DB_HOST@@/",
+                                {
+                                    "Fn::GetAtt": [
+                                        "RDSDBInstance",
+                                        "Endpoint.Address"
+                                    ]
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@DB_NAME@@/",
+                                {
+                                    "Ref": "RDSDBName"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@DB_USERNAME@@/",
+                                {
+                                    "Ref": "RDSUsername"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@DB_PASSWORD@@/",
+                                {
+                                    "Ref": "RDSPassword"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
+                                {
+                                    "Ref": "S3BucketName"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@AWS_REGION@@/",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
+                                "aws configure set region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
+                                "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
+                                "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
+                                "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
+                                "mkdir /opt/alflicense\n",
+                                "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                "semanage permissive -a haproxy_t\n",
+                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/haproxy-discovery.json > /etc/chef/haproxy-discovery.json\n",
+                                "echo '*/5 * * * * cd /etc/chef; chef-client -z -j /etc/chef/haproxy-discovery.json' > ~/haproxy-discovery-cronjob\n",
+                                "crontab ~/haproxy-discovery-cronjob\n"
+                            ]
+                        ]
+                    }
+                  }
+                }
+         },
+        "AlfrescoScaleUpPolicy":{
+               "Type":"AWS::AutoScaling::ScalingPolicy",
+               "Properties":{
+                  "AdjustmentType":"ChangeInCapacity",
+                  "AutoScalingGroupName":{
+                     "Ref":"AlfrescoAutoScalingGroup"
+                  },
+                  "Cooldown":"900",
+                  "ScalingAdjustment":"1"
+               }
+            },
+        "AlfrescoScaleDownPolicy":{
+               "Type":"AWS::AutoScaling::ScalingPolicy",
+               "Properties":{
+                  "AdjustmentType":"ChangeInCapacity",
+                  "AutoScalingGroupName":{
+                     "Ref":"AlfrescoAutoScalingGroup"
+                  },
+                  "Cooldown":"900",
+                  "ScalingAdjustment":"-1"
+               }
+            },
+        "CPUAlarmHigh":{
+               "Type":"AWS::CloudWatch::Alarm",
+               "Properties":{
+                  "AlarmDescription":"Scale-up if CPU > 60% for 5 minutes",
+                  "MetricName":"CPUUtilization",
+                  "Namespace":"AWS/EC2",
+                  "Statistic":"Average",
+                  "Period":"60",
+                  "EvaluationPeriods":"5",
+                  "Threshold":"60",
+                  "AlarmActions":[
+                     {
+                        "Ref":"AlfrescoScaleUpPolicy"
+                     }
+                  ],
+                  "Dimensions":[
+                     {
+                        "Name":"AutoScalingGroupName",
+                        "Value":{
+                           "Ref":"AlfrescoAutoScalingGroup"
+                        }
+                     }
+                  ],
+                  "ComparisonOperator":"GreaterThanThreshold"
+               }
+            },
+        "CPUAlarmLow":{
+               "Type":"AWS::CloudWatch::Alarm",
+               "Properties":{
+                  "AlarmDescription":"Scale-down if CPU < 40% for 30 minutes",
+                  "MetricName":"CPUUtilization",
+                  "Namespace":"AWS/EC2",
+                  "Statistic":"Average",
+                  "Period":"60",
+                  "EvaluationPeriods":"30",
+                  "Threshold":"40",
+                  "AlarmActions":[
+                     {
+                        "Ref":"AlfrescoScaleDownPolicy"
+                     }
+                  ],
+                  "Dimensions":[
+                     {
+                        "Name":"AutoScalingGroupName",
+                        "Value":{
+                           "Ref":"AlfrescoAutoScalingGroup"
+                        }
+                     }
+                  ],
+                  "ComparisonOperator":"LessThanThreshold"
+               }
+            },
+        "AlfrescoAutoScalingSNSTopic":{
+               "Type":"AWS::SNS::Topic",
+               "Properties":{
+                  "Subscription":[
+                     {
+                        "Endpoint":{
+                           "Ref":"OperatorEMail"
+                        },
+                        "Protocol":"Email"
+                     }
+                  ]
+               }
+            },
+        "AlfrescoAutoScalingGroup":{
+               "Type":"AWS::AutoScaling::AutoScalingGroup",
+               "Properties":{
+                  "AvailabilityZones": [ {
+                    "Ref":"AZ1",
+                    "Ref":"AZ2"
+                  }
+                ],
+                  "VPCZoneIdentifier": [ {
+                    "Ref":"AlfrescoSubnet1",
+                    "Ref":"AlfrescoSubnet2"
+                  }
+                ],
+                  "Cooldown":"900",
+                  "DesiredCapacity":"1",
+                  "HealthCheckGracePeriod":"900",
+                  "HealthCheckType":"ELB",
+                  "LaunchConfigurationName":{
+                     "Ref":"AlfrescoASLaunchConfig"
+                  },
+                  "LoadBalancerNames":[
+                     {
+                        "Ref":"ElasticLoadBalancer"
+                     }
+                  ],
+                  "MaxSize":"4",
+                  "MinSize":"1",
+                  "NotificationConfiguration":{
+                     "TopicARN":{
+                        "Ref":"AlfrescoAutoScalingSNSTopic"
+                     },
+                     "NotificationTypes":[
+                        "autoscaling:EC2_INSTANCE_LAUNCH",
+                        "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+                        "autoscaling:EC2_INSTANCE_TERMINATE",
+                        "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+                        "autoscaling:TEST_NOTIFICATION"
+                     ]
+                  },
+                  "Tags":[
+                     {
+                        "Key":"Name",
+                        "Value":"Alfresco Server cluster node",
+                        "PropagateAtLaunch":"true"
+                     }
+                  ]
+               }
+            },
+        "IndexInterface": {
+                    "Type": "AWS::EC2::NetworkInterface",
+                    "Properties": {
+                        "SubnetId": {
+                            "Ref": "AlfrescoSubnet1"
+                        },
+                        "Description": "External interface for Index server",
+                        "GroupSet": [
+                            {
+                                "Ref": "AlfrescoSecurityGroup"
+                            }
+                        ],
+                        "SourceDestCheck": "true",
+                        "Tags": [
+                            {
+                                "Key": "Network",
+                                "Value": "Private"
+                            }
+                        ]
+                    }
+                },
+        "IndexASLaunchConfig": {
+              "Type": "AWS::AutoScaling::LaunchConfiguration",
+              "Metadata": {
+                        "AWS::CloudFormation::Init": {
+                            "config": {
+                              "files" : {
+                                "/tmp/credentials" : {
+                                  "content" : { "Fn::Join" : ["", [
+                                    "echo [default] > /tmp/credentials \n",
+                                    "echo region = ",{ "Ref": "AWS::Region" },"  >> /tmp/credentials \n",
+                                    "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /tmp/credentials \n",
+                                    "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /tmp/credentials \n"
+                                    ]]},
+                                    "mode"  : "000644",
+                                    "owner" : "root",
+                                    "group" : "root"
+                                  }
+                                }
+                            },
+                            "commands": {
+                              "command" : "mkdir /root/.aws && mv /tmp/credentials /root/.aws/credentials"
+                            }
+                        }
+                    },
+              "Properties": {
+                        "KeyName": {
+                            "Ref": "KeyName"
+                        },
+                        "ImageId": {
+                            "Fn::FindInMap": [
+                                "ALINUXAMI",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "AMI"
+                            ]
+                        },
+                        "InstanceMonitoring":"true",
+                        "IamInstanceProfile": {
+                            "Ref": "SetupRoleProfile"
+                        },
+                        "InstanceType": {
+                            "Ref": "IndexInstanceType"
+                        },
+                        "SecurityGroups":[
+                           {
+                              "Ref":"AlfrescoSecurityGroup"
+                           }
+                        ],
+                        "UserData": {
+                            "Fn::Base64": {
+                                "Fn::Join": [
+                                    "",
+                                    [
+                                        "#!/bin/bash -v\n",
+                                        "export NODE_NAME=solr\n",
+                                        "mkdir /etc/chef\n",
+                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/solr.json > /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
+                                        {
+                                            "Ref": "ArtifactRepoUsername"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@ARTIFACT_REPO_PASSWORD@@/",
+                                        {
+                                            "Ref": "ArtifactRepoPassword"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@STACK_NAME@@/",
+                                        {
+                                            "Ref": "AWS::StackName"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@FQDN@@/",
+                                        {
+                                            "Fn::GetAtt": [
+                                                "ElasticLoadBalancer",
+                                                "DNSName"
+                                            ]
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@AWS_ACCESS_KEY@@/",
+                                        {
+                                            "Ref": "CfnKeys"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's#@@AWS_SECRET_KEY@@#",
+                                        {
+                                            "Fn::GetAtt": [
+                                                "CfnKeys",
+                                                "SecretAccessKey"
+                                            ]
+                                        },
+                                        "#g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@DB_HOST@@/",
+                                        {
+                                            "Fn::GetAtt": [
+                                                "RDSDBInstance",
+                                                "Endpoint.Address"
+                                            ]
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@DB_NAME@@/",
+                                        {
+                                            "Ref": "RDSDBName"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@DB_USERNAME@@/",
+                                        {
+                                            "Ref": "RDSUsername"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@DB_PASSWORD@@/",
+                                        {
+                                            "Ref": "RDSPassword"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
+                                        {
+                                            "Ref": "S3BucketName"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@AWS_REGION@@/",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
+                                        "#curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                        "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
+                                        "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
+                                        "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
+                                        "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
+                                        "mkdir /opt/alflicense\n",
+                                        "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                        "chown tomcat:tomcat /opt/alflicense/license.lic\n",
+                                        "#semanage permissive -a haproxy_t\n",
+                                        "#cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
+                                    ]
+                                ]
+                            }
+                          }
+                        }
+                    },
+        "IndexScaleUpPolicy":{
+                   "Type":"AWS::AutoScaling::ScalingPolicy",
+                   "Properties":{
+                      "AdjustmentType":"ChangeInCapacity",
+                      "AutoScalingGroupName":{
+                         "Ref":"AlfrescoAutoScalingGroup"
+                      },
+                      "Cooldown":"900",
+                      "ScalingAdjustment":"1"
+                   }
+                },
+        "IndexScaleDownPolicy":{
+                   "Type":"AWS::AutoScaling::ScalingPolicy",
+                   "Properties":{
+                      "AdjustmentType":"ChangeInCapacity",
+                      "AutoScalingGroupName":{
+                         "Ref":"AlfrescoAutoScalingGroup"
+                      },
+                      "Cooldown":"900",
+                      "ScalingAdjustment":"-1"
+                   }
+                },
+        "IndexCPUAlarmHigh":{
+                   "Type":"AWS::CloudWatch::Alarm",
+                   "Properties":{
+                      "AlarmDescription":"Scale-up if CPU > 60% for 5 minutes",
+                      "MetricName":"CPUUtilization",
+                      "Namespace":"AWS/EC2",
+                      "Statistic":"Average",
+                      "Period":"60",
+                      "EvaluationPeriods":"5",
+                      "Threshold":"60",
+                      "AlarmActions":[
+                         {
+                            "Ref":"IndexScaleUpPolicy"
+                         }
+                      ],
+                      "Dimensions":[
+                         {
+                            "Name":"AutoScalingGroupName",
+                            "Value":{
+                               "Ref":"IndexAutoScalingGroup"
+                            }
+                         }
+                      ],
+                      "ComparisonOperator":"GreaterThanThreshold"
+                   }
+                },
+        "IndexCPUAlarmLow":{
+                   "Type":"AWS::CloudWatch::Alarm",
+                   "Properties":{
+                      "AlarmDescription":"Scale-down if CPU < 40% for 30 minutes",
+                      "MetricName":"CPUUtilization",
+                      "Namespace":"AWS/EC2",
+                      "Statistic":"Average",
+                      "Period":"60",
+                      "EvaluationPeriods":"30",
+                      "Threshold":"40",
+                      "AlarmActions":[
+                         {
+                            "Ref":"IndexScaleDownPolicy"
+                         }
+                      ],
+                      "Dimensions":[
+                         {
+                            "Name":"AutoScalingGroupName",
+                            "Value":{
+                               "Ref":"IndexAutoScalingGroup"
+                            }
+                         }
+                      ],
+                      "ComparisonOperator":"LessThanThreshold"
+                   }
+                },
+        "IndexAutoScalingSNSTopic":{
+                   "Type":"AWS::SNS::Topic",
+                   "Properties":{
+                      "Subscription":[
+                         {
+                            "Endpoint":{
+                               "Ref":"OperatorEMail"
+                            },
+                            "Protocol":"Email"
+                         }
+                      ]
+                   }
+                },
+        "IndexAutoScalingGroup":{
+                   "Type":"AWS::AutoScaling::AutoScalingGroup",
+                   "Properties":{
+                      "AvailabilityZones": [ {
+                        "Ref":"AZ1",
+                        "Ref":"AZ2"
+                      }
+                    ],
+                      "VPCZoneIdentifier": [ {
+                        "Ref":"AlfrescoSubnet1",
+                        "Ref":"AlfrescoSubnet2"
+                      }
+                    ],
+                      "Cooldown":"900",
+                      "DesiredCapacity":"1",
+                      "HealthCheckGracePeriod":"900",
+                      "HealthCheckType":"EC2",
+                      "LaunchConfigurationName":{
+                         "Ref":"IndexASLaunchConfig"
+                      },
+                      "MaxSize":"4",
+                      "MinSize":"1",
+                      "NotificationConfiguration":{
+                         "TopicARN":{
+                            "Ref":"IndexAutoScalingSNSTopic"
+                         },
+                         "NotificationTypes":[
+                            "autoscaling:EC2_INSTANCE_LAUNCH",
+                            "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+                            "autoscaling:EC2_INSTANCE_TERMINATE",
+                            "autoscaling:EC2_INSTANCE_TERMINATE_ERROR",
+                            "autoscaling:TEST_NOTIFICATION"
+                         ]
+                      },
+                      "Tags":[
+                         {
+                            "Key":"Name",
+                            "Value":"Alfrsco Index Server node",
+                            "PropagateAtLaunch":"true"
+                         }
+                      ]
+                   }
+                },
+        "RDSSubnet1": {
+          "Type": "AWS::EC2::Subnet",
+            "Properties": {
+              "VpcId": {
+                "Ref": "VPC"
+            },
+              "CidrBlock": {
+                "Fn::FindInMap": [
+                    "SubnetConfig",
+                    "RDS1",
+                    "CIDR"
+                ]
+            },
+              "Tags": [
+                {
+                    "Key": "Application",
+                    "Value": "RDS"
+                },
+                {
+                    "Key": "Network",
+                    "Value": "Private"
+                }
+            ],
+              "AvailabilityZone": {
+                "Ref": "AZ1"
+            }
+          }
+        },
+        "RDSSubnet2": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "VpcId": {
+                    "Ref": "VPC"
+                },
+                "CidrBlock": {
+                    "Fn::FindInMap": [
+                        "SubnetConfig",
+                        "RDS2",
+                        "CIDR"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "RDS"
+                    },
+                    {
+                        "Key": "Network",
+                        "Value": "Private"
+                    }
+                ],
+                "AvailabilityZone": {
+                    "Ref": "AZ2"
+                }
+            }
+        },
+        "S3Bucket":{
+            "Type" : "AWS::S3::Bucket",
+            "Properties": {
+              "BucketName": {"Ref":"S3BucketName"},
+              "AccessControl": "BucketOwnerFullControl"
+            }
+        },
         "AlfrescoSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -1820,6 +1930,14 @@
                       "IpProtocol": "tcp",
                       "FromPort": "80",
                       "ToPort": "80",
+                      "SourceSecurityGroupId": {
+                          "Ref": "ELBSecurityGroup"
+                      }
+                  },
+                  {
+                      "IpProtocol": "tcp",
+                      "FromPort": "443",
+                      "ToPort": "443",
                       "SourceSecurityGroupId": {
                           "Ref": "ELBSecurityGroup"
                       }
@@ -1896,65 +2014,6 @@
                     }
                 ]
             }
-        },
-        "RDSDBInstance": {
-            "Type": "AWS::RDS::DBInstance",
-            "Properties": {
-                "MultiAZ": "true",
-                "DBSecurityGroups": [
-                    {
-                        "Ref": "RDSSecurityGroup"
-                    }
-                ],
-                "AllocatedStorage": "5",
-                "DBInstanceClass": {
-                    "Ref": "RDSInstanceType"
-                },
-                "Engine": "MySQL",
-                "MasterUsername": {
-                    "Ref": "RDSUsername"
-                },
-                "MasterUserPassword": {
-                    "Ref": "RDSPassword"
-                },
-                "DBSubnetGroupName": {
-                    "Ref": "RDSDBSubnetGroup"
-                },
-                "DBName": {
-                    "Ref": "RDSDBName"
-                }
-            },
-            "DeletionPolicy": "Snapshot"
-        },
-        "RDSDBSubnetGroup": {
-            "Type": "AWS::RDS::DBSubnetGroup",
-            "Properties": {
-                "DBSubnetGroupDescription": "description",
-                "SubnetIds": [
-                    {
-                        "Ref": "RDSSubnet1"
-                    },
-                    {
-                        "Ref": "RDSSubnet2"
-                    }
-                ]
-            }
-        },
-        "RDSSecurityGroup": {
-            "Type": "AWS::RDS::DBSecurityGroup",
-            "Properties": {
-                "EC2VpcId": {
-                    "Ref": "VPC"
-                },
-                "GroupDescription": "Allow AlfrescoSecurityGroup access to RDS DB",
-                "DBSecurityGroupIngress": [
-                    {
-                        "EC2SecurityGroupId": {
-                            "Ref": "AlfrescoSecurityGroup"
-                        }
-                    }
-                ]
-            }
         }
     },
     "Outputs": {
@@ -1963,16 +2022,7 @@
           "Value": {
             "Fn::Join": [
                 "",
-                [
-                    "http://",
-                    {
-                        "Fn::GetAtt": [
-                            "ElasticLoadBalancer",
-                            "DNSName"
-                        ]
-                    },
-                    "/share"
-                ]
+                [ "http://", { "Fn::GetAtt": [ "ElasticLoadBalancer", "DNSName" ] }, "/share" ]
             ]
         }
     }
