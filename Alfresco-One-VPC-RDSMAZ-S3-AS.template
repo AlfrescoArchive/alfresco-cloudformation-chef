@@ -1254,72 +1254,6 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "config": {
-                      "files":{
-                        "/root/.awssecret":{
-                            "content":{
-                               "Fn::Join":[
-                                  "",
-                                  [
-                                     "[default]\n",
-                                     "aws_access_key_id = ",
-                                     {
-                                        "Ref":"CfnKeys"
-                                     },
-                                     "\n",
-                                     "aws_secret_access_key = ",
-                                     {
-                                        "Fn::GetAtt":[
-                                           "CfnKeys",
-                                           "SecretAccessKey"
-                                        ]
-                                     },
-                                     "\n",
-                                     "region = ",
-                                     {
-                                        "Ref":"AWS::Region"
-                                     },
-                                     "\n"
-                                  ]
-                               ]
-                            },
-                            "mode":"000600",
-                            "owner":"root",
-                            "group":"root"
-                         },
-                         "/root/haproxy-solr-discovery.sh":{
-                             "content":{
-                                "Fn::Join":[
-                                   "",
-                                   [
-                                     "#!/bin/bash -v\n",
-                                     "cd /etc/chef \n",
-                                     "aws configure set region ",
-                                     {
-                                        "Ref":"AWS::Region"
-                                     },
-                                     "\n",
-                                     "aws configure set aws_access_key_id ",
-                                     {
-                                        "Ref":"CfnKeys"
-                                     },
-                                     "\n",
-                                     "aws configure set aws_secret_access_key ",
-                                     {
-                                        "Fn::GetAtt":[
-                                           "CfnKeys",
-                                           "SecretAccessKey"
-                                        ]
-                                     },
-                                     "\n",
-                                     "chef-client -z -j /etc/chef/haproxy-discovery.json \n"
-                                   ]
-                                ]
-                             },
-                             "mode":"000655",
-                             "owner":"root",
-                             "group":"root"
-                          }
-                      }
                 }
               }
             },
@@ -1605,39 +1539,7 @@
               "Metadata": {
                         "AWS::CloudFormation::Init": {
                             "config": {
-                              "files":{
-                                "/root/.awssecret":{
-                                    "content":{
-                                       "Fn::Join":[
-                                          "",
-                                          [
-                                             "[default]\n",
-                                             "aws_access_key_id = ",
-                                             {
-                                                "Ref":"CfnKeys"
-                                             },
-                                             "\n",
-                                             "aws_secret_access_key = ",
-                                             {
-                                                "Fn::GetAtt":[
-                                                   "CfnKeys",
-                                                   "SecretAccessKey"
-                                                ]
-                                             },
-                                             "\n",
-                                             "region = ",
-                                             {
-                                                "Ref":"AWS::Region"
-                                             },
-                                             "\n"
-                                          ]
-                                       ]
-                                    },
-                                    "mode":"000600",
-                                    "owner":"root",
-                                    "group":"root"
-                                 }
-                              }
+              
                             }
                         }
                     },
