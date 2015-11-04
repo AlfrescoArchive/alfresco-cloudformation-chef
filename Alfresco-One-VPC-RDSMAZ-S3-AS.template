@@ -1285,16 +1285,41 @@
                             "mode":"000600",
                             "owner":"root",
                             "group":"root"
-                         }
-                      },
-                      "commands":{
-                         "00make_aws_dir":{
-                            "command":[
-                               "mkdir",
-                               "/root/.aws"
-                            ]
-                         }
-                    }
+                         },
+                         "/root/haproxy-solr-discovery.sh":{
+                             "content":{
+                                "Fn::Join":[
+                                   "",
+                                   [
+                                     "#!/bin/bash -v\n",
+                                     "cd /etc/chef \n",
+                                     "aws configure set region ",
+                                     {
+                                        "Ref":"AWS::Region"
+                                     },
+                                     "\n",
+                                     "aws configure set aws_access_key_id ",
+                                     {
+                                        "Ref":"CfnKeys"
+                                     },
+                                     "\n",
+                                     "aws configure set aws_secret_access_key ",
+                                     {
+                                        "Fn::GetAtt":[
+                                           "CfnKeys",
+                                           "SecretAccessKey"
+                                        ]
+                                     },
+                                     "\n",
+                                     "chef-client -z -j /etc/chef/haproxy-discovery.json \n"
+                                   ]
+                                ]
+                             },
+                             "mode":"000655",
+                             "owner":"root",
+                             "group":"root"
+                          }
+                      }
                 }
               }
             },
@@ -1329,9 +1354,9 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
-                                "export NODE_NAME=allinone\n",
+                                "export NODE_NAME=share\n",
                                 "mkdir /etc/chef\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/allinone.json > /etc/chef/attributes.json\n",
+                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}.json > /etc/chef/attributes.json\n",
                                 "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
                                 {
                                     "Ref": "ArtifactRepoUsername"
@@ -1417,7 +1442,13 @@
                                 "semanage permissive -a haproxy_t\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/haproxy-discovery.json > /etc/chef/haproxy-discovery.json\n",
-                                "echo '*/5 * * * * cd /etc/chef; chef-client -z -j /etc/chef/haproxy-discovery.json' > ~/haproxy-discovery-cronjob\n",
+                                "sed -i 's/@@STACK_NAME@@/",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "/g' /etc/chef/haproxy-discovery.json\n",
+                                "echo \n",
+                                "echo '*/5 * * * * /root/haproxy-solr-discovery.sh' > ~/haproxy-discovery-cronjob\n",
                                 "crontab ~/haproxy-discovery-cronjob\n"
                             ]
                         ]
@@ -1499,19 +1530,6 @@
                   "ComparisonOperator":"LessThanThreshold"
                }
             },
-        "AlfrescoAutoScalingSNSTopic":{
-               "Type":"AWS::SNS::Topic",
-               "Properties":{
-                  "Subscription":[
-                     {
-                        "Endpoint":{
-                           "Ref":"OperatorEMail"
-                        },
-                        "Protocol":"Email"
-                     }
-                  ]
-               }
-            },
         "AlfrescoAutoScalingGroup":{
                "Type":"AWS::AutoScaling::AutoScalingGroup",
                "Properties":{
@@ -1526,7 +1544,7 @@
                   }
                 ],
                   "Cooldown":"900",
-                  "DesiredCapacity":"1",
+                  "DesiredCapacity":"2",
                   "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
                   "LaunchConfigurationName":{
@@ -1538,10 +1556,10 @@
                      }
                   ],
                   "MaxSize":"4",
-                  "MinSize":"1",
+                  "MinSize":"2",
                   "NotificationConfiguration":{
                      "TopicARN":{
-                        "Ref":"AlfrescoAutoScalingSNSTopic"
+                        "Ref":"NotificationTopic"
                      },
                      "NotificationTypes":[
                         "autoscaling:EC2_INSTANCE_LAUNCH",
@@ -1586,22 +1604,39 @@
               "Metadata": {
                         "AWS::CloudFormation::Init": {
                             "config": {
-                              "files" : {
-                                "/tmp/credentials" : {
-                                  "content" : { "Fn::Join" : ["", [
-                                    "echo [default] > /tmp/credentials \n",
-                                    "echo region = ",{ "Ref": "AWS::Region" },"  >> /tmp/credentials \n",
-                                    "echo aws_access_key_id = ",{ "Ref": "CfnKeys" }," >> /tmp/credentials \n",
-                                    "echo aws_secret_access_key = ",{ "Fn::GetAtt": [ "CfnKeys", "SecretAccessKey" ] }," >> /tmp/credentials \n"
-                                    ]]},
-                                    "mode"  : "000644",
-                                    "owner" : "root",
-                                    "group" : "root"
-                                  }
-                                }
-                            },
-                            "commands": {
-                              "command" : "mkdir /root/.aws && mv /tmp/credentials /root/.aws/credentials"
+                              "files":{
+                                "/root/.awssecret":{
+                                    "content":{
+                                       "Fn::Join":[
+                                          "",
+                                          [
+                                             "[default]\n",
+                                             "aws_access_key_id = ",
+                                             {
+                                                "Ref":"CfnKeys"
+                                             },
+                                             "\n",
+                                             "aws_secret_access_key = ",
+                                             {
+                                                "Fn::GetAtt":[
+                                                   "CfnKeys",
+                                                   "SecretAccessKey"
+                                                ]
+                                             },
+                                             "\n",
+                                             "region = ",
+                                             {
+                                                "Ref":"AWS::Region"
+                                             },
+                                             "\n"
+                                          ]
+                                       ]
+                                    },
+                                    "mode":"000600",
+                                    "owner":"root",
+                                    "group":"root"
+                                 }
+                              }
                             }
                         }
                     },
@@ -1638,7 +1673,7 @@
                                         "#!/bin/bash -v\n",
                                         "export NODE_NAME=solr\n",
                                         "mkdir /etc/chef\n",
-                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/solr.json > /etc/chef/attributes.json\n",
+                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}.json > /etc/chef/attributes.json\n",
                                         "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
                                         {
                                             "Ref": "ArtifactRepoUsername"
@@ -1709,16 +1744,14 @@
                                         },
                                         "/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "#curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                         "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
                                         "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                         "mkdir /opt/alflicense\n",
                                         "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
-                                        "chown tomcat:tomcat /opt/alflicense/license.lic\n",
-                                        "#semanage permissive -a haproxy_t\n",
-                                        "#cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
+                                        "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                                     ]
                                 ]
                             }
@@ -1799,19 +1832,6 @@
                       "ComparisonOperator":"LessThanThreshold"
                    }
                 },
-        "IndexAutoScalingSNSTopic":{
-                   "Type":"AWS::SNS::Topic",
-                   "Properties":{
-                      "Subscription":[
-                         {
-                            "Endpoint":{
-                               "Ref":"OperatorEMail"
-                            },
-                            "Protocol":"Email"
-                         }
-                      ]
-                   }
-                },
         "IndexAutoScalingGroup":{
                    "Type":"AWS::AutoScaling::AutoScalingGroup",
                    "Properties":{
@@ -1826,17 +1846,17 @@
                       }
                     ],
                       "Cooldown":"900",
-                      "DesiredCapacity":"1",
+                      "DesiredCapacity":"2",
                       "HealthCheckGracePeriod":"900",
                       "HealthCheckType":"EC2",
                       "LaunchConfigurationName":{
                          "Ref":"IndexASLaunchConfig"
                       },
                       "MaxSize":"4",
-                      "MinSize":"1",
+                      "MinSize":"2",
                       "NotificationConfiguration":{
                          "TopicARN":{
-                            "Ref":"IndexAutoScalingSNSTopic"
+                            "Ref":"NotificationTopic"
                          },
                          "NotificationTypes":[
                             "autoscaling:EC2_INSTANCE_LAUNCH",
@@ -1849,7 +1869,7 @@
                       "Tags":[
                          {
                             "Key":"Name",
-                            "Value":"Alfrsco Index Server node",
+                            "Value":"Alfresco Index Server node",
                             "PropagateAtLaunch":"true"
                          }
                       ]
