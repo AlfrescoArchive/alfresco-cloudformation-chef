@@ -1432,6 +1432,7 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "\n",
+                                "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/723955/chef-alfresco.tar.gz\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
@@ -1744,6 +1745,7 @@
                                         },
                                         "/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
+                                        "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/723955/chef-alfresco.tar.gz\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
