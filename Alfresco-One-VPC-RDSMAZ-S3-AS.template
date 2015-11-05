@@ -1364,7 +1364,7 @@
         "AlfrescoAutoScalingGroup":{
                "Type":"AWS::AutoScaling::AutoScalingGroup",
                "Properties":{
-                  "AvailabilityZones": [ { "Fn::GetAZs" :  { "Ref":"AZ1", "Ref":"AZ2" } } ],
+                  "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                   "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                   "Cooldown":"900",
                   "DesiredCapacity":"2",
@@ -1675,7 +1675,7 @@
         "IndexAutoScalingGroup":{
                    "Type":"AWS::AutoScaling::AutoScalingGroup",
                    "Properties":{
-                      "AvailabilityZones": [ { "Fn::GetAZs" :  { "Ref":"AZ1", "Ref":"AZ2" }  } ],
+                      "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                       "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                       "Cooldown":"900",
                       "DesiredCapacity":"2",
