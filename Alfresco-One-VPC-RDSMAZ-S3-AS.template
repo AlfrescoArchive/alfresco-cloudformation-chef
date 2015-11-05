@@ -1062,6 +1062,13 @@
                                     "Resource": "*"
                                 },
                                 {
+                                    "Resource": "*",
+                                      "Action": [
+                                          "s3:List*"
+                                      ],
+                                      "Effect": "Allow"
+                                },
+                                {
                                     "Effect": "Allow",
                                     "Action": [
                                         "s3:*"
@@ -1136,6 +1143,13 @@
                                       "cloudwatch:PutMetricAlarm"
                                   ],
                                   "Resource": "*"
+                              },
+                              {
+                                  "Resource": "*",
+                                    "Action": [
+                                        "s3:List*"
+                                    ],
+                                    "Effect": "Allow"
                               },
                               {
                                   "Effect": "Allow",
