@@ -1432,6 +1432,7 @@
                                 "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
                                 "semanage port -a -t http_port_t -p tcp 2100\n",
                                 "semanage permissive -a httpd_t\n",
+                                "semanage permissive -a haproxy_t\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
