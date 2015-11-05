@@ -843,167 +843,6 @@
                 "RouteTableId": { "Ref": "PublicRouteTable" }
             }
         },
-        "RDSNetworkAcl": {
-            "Type": "AWS::EC2::NetworkAcl",
-            "Properties": {
-                "VpcId": {
-                    "Ref": "VPC"
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": "RDS Instance (MySQL)"
-                    },
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    }
-                ]
-            }
-        },
-        "InboundRDSNetworkAclEntry1": {
-            "Type": "AWS::EC2::NetworkAclEntry",
-            "Properties": {
-                "NetworkAclId": {
-                    "Ref": "RDSNetworkAcl"
-                },
-                "RuleNumber": "100",
-                "Protocol": "6",
-                "RuleAction": "allow",
-                "Egress": "false",
-                "CidrBlock": {
-                    "Fn::FindInMap": [
-                        "SubnetConfig",
-                        "Alfresco1",
-                        "CIDR"
-                    ]
-                },
-                "PortRange": {
-                    "From": "3306",
-                    "To": "3306"
-                }
-            }
-        },
-        "InboundRDSNetworkAclEntry2": {
-            "Type": "AWS::EC2::NetworkAclEntry",
-            "Properties": {
-                "NetworkAclId": {
-                    "Ref": "RDSNetworkAcl"
-                },
-                "RuleNumber": "101",
-                "Protocol": "6",
-                "RuleAction": "allow",
-                "Egress": "false",
-                "CidrBlock": {
-                    "Fn::FindInMap": [
-                        "SubnetConfig",
-                        "Alfresco2",
-                        "CIDR"
-                    ]
-                },
-                "PortRange": {
-                    "From": "3306",
-                    "To": "3306"
-                }
-            }
-        },
-        "OutBoundRDSNetworkAclEntry": {
-            "Type": "AWS::EC2::NetworkAclEntry",
-            "Properties": {
-                "NetworkAclId": {
-                    "Ref": "RDSNetworkAcl"
-                },
-                "RuleNumber": "101",
-                "Protocol": "6",
-                "RuleAction": "allow",
-                "Egress": "true",
-                "CidrBlock": "0.0.0.0/0",
-                "PortRange": {
-                    "From": "0",
-                    "To": "65535"
-                }
-            }
-        },
-        "RDSSubnetNetworkAclAssociation1": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "RDSSubnet1"
-                },
-                "NetworkAclId": {
-                    "Ref": "RDSNetworkAcl"
-                }
-            }
-        },
-        "RDSSubnetNetworkAclAssociation2": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "RDSSubnet2"
-                },
-                "NetworkAclId": {
-                    "Ref": "RDSNetworkAcl"
-                }
-            }
-        },
-        "PublicNetworkAcl": {
-            "Type": "AWS::EC2::NetworkAcl",
-            "Properties": {
-                "VpcId": { "Ref": "VPC" },
-                "Tags": [
-                    { "Key": "Application", "Value": "ELB and NAT Instance" },
-                    { "Key": "Network", "Value": "Public" }
-                ]
-            }
-        },
-        "InboundPublicNetworkAclEntry": {
-            "Type": "AWS::EC2::NetworkAclEntry",
-            "Properties": {
-                "NetworkAclId": { "Ref": "PublicNetworkAcl" },
-                "RuleNumber": "100", "Protocol": "6",
-                "RuleAction": "allow", "Egress": "false",
-                "CidrBlock": "0.0.0.0/0",
-                "PortRange": { "From": "0", "To": "65535" }
-            }
-        },
-        "OutBoundPublicNetworkAclEntry": {
-            "Type": "AWS::EC2::NetworkAclEntry",
-            "Properties": {
-                "NetworkAclId": { "Ref": "PublicNetworkAcl" },
-                "RuleNumber": "100", "Protocol": "6",
-                "RuleAction": "allow", "Egress": "true",
-                "CidrBlock": "0.0.0.0/0",
-                "PortRange": { "From": "0", "To": "65535" }
-            }
-        },
-        "AlfrescoSubnetNetworkAclAssociation1": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": { "Ref": "AlfrescoSubnet1" },
-                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
-            }
-        },
-        "AlfrescoSubnetNetworkAclAssociation2": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": { "Ref": "AlfrescoSubnet2" },
-                "NetworkAclId": { "Ref": "PublicNetworkAcl"  }
-            }
-        },
-        "PublicSubnetNetworkAclAssociation1": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": { "Ref": "NATSubnet1" },
-                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
-            }
-        },
-        "PublicSubnetNetworkAclAssociation2": {
-            "Type": "AWS::EC2::SubnetNetworkAclAssociation",
-            "Properties": {
-                "SubnetId": { "Ref": "NATSubnet2" },
-                "NetworkAclId": { "Ref": "PublicNetworkAcl" }
-            }
-        },
         "SetupRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
@@ -1326,6 +1165,8 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
+                                "yum install -y libffi-devel openssl-devel python-pip\n",
+                                "pip install pyopenssl ndg-httpsclient pyasn1\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
@@ -1433,6 +1274,12 @@
                                 "semanage port -a -t http_port_t -p tcp 2100\n",
                                 "semanage permissive -a httpd_t\n",
                                 "semanage permissive -a haproxy_t\n",
+                                "echo [default] > /root/.aws/config\n",
+                                "echo region = ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                " >> /root/.aws/config\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
@@ -1517,28 +1364,14 @@
         "AlfrescoAutoScalingGroup":{
                "Type":"AWS::AutoScaling::AutoScalingGroup",
                "Properties":{
-                  "AvailabilityZones": [ {
-                    "Ref":"AZ1",
-                    "Ref":"AZ2"
-                  }
-                ],
-                  "VPCZoneIdentifier": [ {
-                    "Ref":"AlfrescoSubnet1",
-                    "Ref":"AlfrescoSubnet2"
-                  }
-                ],
+                  "AvailabilityZones": [ { "Fn::GetAtt" : [ { "Ref":"AZ1", "Ref":"AZ2" } ] } ],
+                  "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                   "Cooldown":"900",
                   "DesiredCapacity":"2",
                   "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
-                  "LaunchConfigurationName":{
-                     "Ref":"AlfrescoASLaunchConfig"
-                  },
-                  "LoadBalancerNames":[
-                     {
-                        "Ref":"ElasticLoadBalancer"
-                     }
-                  ],
+                  "LaunchConfigurationName": { "Ref":"AlfrescoASLaunchConfig" },
+                  "LoadBalancerNames":[ { "Ref":"ElasticLoadBalancer" } ],
                   "MaxSize":"4",
                   "MinSize":"2",
                   "NotificationConfiguration":{
@@ -1646,6 +1479,8 @@
                                     "",
                                     [
                                         "#!/bin/bash -v\n",
+                                        "yum install -y libffi-devel openssl-devel python-pip\n",
+                                        "pip install pyopenssl ndg-httpsclient pyasn1\n",
                                         "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                         "/usr/bin/cfn-init",
                                         "    --stack ",
@@ -1750,6 +1585,12 @@
                                         "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                         "mkdir /opt/alflicense\n",
                                         "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                        "echo [default] > /root/.aws/config\n",
+                                        "echo region = ",
+                                        {
+                                            "Ref": "AWS::Region"
+                                        },
+                                        " >> /root/.aws/config\n",
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                                     ]
                                 ]
@@ -1834,16 +1675,8 @@
         "IndexAutoScalingGroup":{
                    "Type":"AWS::AutoScaling::AutoScalingGroup",
                    "Properties":{
-                      "AvailabilityZones": [ {
-                        "Ref":"AZ1",
-                        "Ref":"AZ2"
-                      }
-                    ],
-                      "VPCZoneIdentifier": [ {
-                        "Ref":"AlfrescoSubnet1",
-                        "Ref":"AlfrescoSubnet2"
-                      }
-                    ],
+                      "AvailabilityZones": [ { "Fn::GetAtt" : [ { "Ref":"AZ1", "Ref":"AZ2" } ] } ],
+                      "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                       "Cooldown":"900",
                       "DesiredCapacity":"2",
                       "HealthCheckGracePeriod":"900",
