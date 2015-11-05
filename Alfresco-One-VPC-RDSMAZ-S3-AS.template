@@ -158,7 +158,7 @@
         },
         "AlfrescoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco admin user, default is admin",
+            "Description": "Password for the Alfresco admin user, default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
             "Default": "admin",
             "NoEcho": "TRUE"
         },
@@ -1254,6 +1254,30 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "config": {
+                      "files":{
+                        "/root/.awssecret":{
+                           "content":{
+                              "Fn::Join":[
+                                 "",
+                                 [
+                                    {
+                                       "Ref":"CfnKeys"
+                                    },
+                                    "\n",
+                                    {
+                                       "Fn::GetAtt":[
+                                          "CfnKeys",
+                                          "SecretAccessKey"
+                                       ]
+                                    }
+                                 ]
+                              ]
+                           },
+                           "mode":"000600",
+                           "owner":"root",
+                           "group":"root"
+                        }
+                      }
                 }
               }
             },
@@ -1288,6 +1312,29 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
+                                "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                "/usr/bin/cfn-init",
+                                "    --stack ",
+                                {
+                                   "Ref":"AWS::StackName"
+                                },
+                                " -r AlfrescoASLaunchConfig",
+                                "    --access-key ",
+                                {
+                                   "Ref":"CfnKeys"
+                                },
+                                "    --secret-key ",
+                                {
+                                   "Fn::GetAtt":[
+                                      "CfnKeys",
+                                      "SecretAccessKey"
+                                   ]
+                                },
+                                "    --region     ",
+                                {
+                                   "Ref":"AWS::Region"
+                                },
+                                "\n",
                                 "export NODE_NAME=share\n",
                                 "mkdir /etc/chef\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}.json > /etc/chef/attributes.json\n",
@@ -1361,11 +1408,6 @@
                                 },
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "aws configure set region ",
-                                {
-                                    "Ref": "AWS::Region"
-                                },
-                                "\n",
                                 "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/723955/chef-alfresco.tar.gz\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
@@ -1374,17 +1416,9 @@
                                 "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                 "mkdir /opt/alflicense\n",
                                 "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
-                                "semanage permissive -a haproxy_t\n",
-                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/haproxy-discovery.json > /etc/chef/haproxy-discovery.json\n",
-                                "sed -i 's/@@STACK_NAME@@/",
-                                {
-                                    "Ref": "AWS::StackName"
-                                },
-                                "/g' /etc/chef/haproxy-discovery.json\n",
-                                "echo \n",
-                                "echo '*/5 * * * * /root/haproxy-solr-discovery.sh' > ~/haproxy-discovery-cronjob\n",
-                                "crontab ~/haproxy-discovery-cronjob\n"
+                                "semanage port -a -t http_port_t -p tcp 2100\n",
+                                "semanage permissive -a httpd_t\n",
+                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
                             ]
                         ]
                     }
@@ -1539,7 +1573,30 @@
               "Metadata": {
                         "AWS::CloudFormation::Init": {
                             "config": {
-              
+                              "files":{
+                                "/root/.awssecret":{
+                                   "content":{
+                                      "Fn::Join":[
+                                         "",
+                                         [
+                                            {
+                                               "Ref":"CfnKeys"
+                                            },
+                                            "\n",
+                                            {
+                                               "Fn::GetAtt":[
+                                                  "CfnKeys",
+                                                  "SecretAccessKey"
+                                               ]
+                                            }
+                                         ]
+                                      ]
+                                   },
+                                   "mode":"000600",
+                                   "owner":"root",
+                                   "group":"root"
+                                }
+                              }
                             }
                         }
                     },
@@ -1574,6 +1631,29 @@
                                     "",
                                     [
                                         "#!/bin/bash -v\n",
+                                        "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                        "/usr/bin/cfn-init",
+                                        "    --stack ",
+                                        {
+                                           "Ref":"AWS::StackName"
+                                        },
+                                        " -r IndexASLaunchConfig",
+                                        "    --access-key ",
+                                        {
+                                           "Ref":"CfnKeys"
+                                        },
+                                        "    --secret-key ",
+                                        {
+                                           "Fn::GetAtt":[
+                                              "CfnKeys",
+                                              "SecretAccessKey"
+                                           ]
+                                        },
+                                        "    --region     ",
+                                        {
+                                           "Ref":"AWS::Region"
+                                        },
+                                        "\n",
                                         "export NODE_NAME=solr\n",
                                         "mkdir /etc/chef\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}.json > /etc/chef/attributes.json\n",
