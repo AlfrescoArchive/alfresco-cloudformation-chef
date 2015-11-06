@@ -814,12 +814,8 @@
         "AlfrescoSubnetRouteTableAssociation1": {
             "Type": "AWS::EC2::SubnetRouteTableAssociation",
             "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet1"
-                },
-                "RouteTableId": {
-                    "Ref": "AlfrescoRouteTable1"
-                }
+                "SubnetId": { "Ref": "AlfrescoSubnet1" },
+                "RouteTableId": { "Ref": "AlfrescoRouteTable1" }
             }
         },
         "AlfrescoSubnetRouteTableAssociation2": {
@@ -1081,27 +1077,6 @@
             },
             "DeletionPolicy": "Snapshot"
         },
-        "AlfrescoInterface": {
-            "Type": "AWS::EC2::NetworkInterface",
-            "Properties": {
-                "SubnetId": {
-                    "Ref": "AlfrescoSubnet1"
-                },
-                "Description": "External interface for Alfresco server",
-                "GroupSet": [
-                    {
-                        "Ref": "AlfrescoSecurityGroup"
-                    }
-                ],
-                "SourceDestCheck": "true",
-                "Tags": [
-                    {
-                        "Key": "Network",
-                        "Value": "Private"
-                    }
-                ]
-            }
-        },
         "AlfrescoASLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
             "Metadata": {
@@ -1165,6 +1140,7 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
+                                "yum check-update\n",
                                 "yum install -y libffi-devel openssl-devel python-pip\n",
                                 "pip install pyopenssl ndg-httpsclient pyasn1\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
@@ -1263,7 +1239,7 @@
                                 },
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/723955/chef-alfresco.tar.gz\n",
+                                "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
@@ -1274,13 +1250,19 @@
                                 "semanage port -a -t http_port_t -p tcp 2100\n",
                                 "semanage permissive -a httpd_t\n",
                                 "semanage permissive -a haproxy_t\n",
+                                "mkdir /root/.aws/\n",
                                 "echo [default] > /root/.aws/config\n",
                                 "echo region = ",
                                 {
                                     "Ref": "AWS::Region"
                                 },
+
                                 " >> /root/.aws/config\n",
-                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
+                                "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
+                                "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
+                                "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
+                                "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Alfresco|awk -F\" '{ print $4 }' )\n",
+                                "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                             ]
                         ]
                     }
@@ -1367,13 +1349,13 @@
                   "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                   "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                   "Cooldown":"900",
-                  "DesiredCapacity":"2",
+                  "DesiredCapacity":"1",
                   "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
                   "LaunchConfigurationName": { "Ref":"AlfrescoASLaunchConfig" },
                   "LoadBalancerNames":[ { "Ref":"ElasticLoadBalancer" } ],
                   "MaxSize":"4",
-                  "MinSize":"2",
+                  "MinSize":"1",
                   "NotificationConfiguration":{
                      "TopicARN":{
                         "Ref":"NotificationTopic"
@@ -1395,27 +1377,6 @@
                   ]
                }
             },
-        "IndexInterface": {
-                    "Type": "AWS::EC2::NetworkInterface",
-                    "Properties": {
-                        "SubnetId": {
-                            "Ref": "AlfrescoSubnet1"
-                        },
-                        "Description": "External interface for Index server",
-                        "GroupSet": [
-                            {
-                                "Ref": "AlfrescoSecurityGroup"
-                            }
-                        ],
-                        "SourceDestCheck": "true",
-                        "Tags": [
-                            {
-                                "Key": "Network",
-                                "Value": "Private"
-                            }
-                        ]
-                    }
-                },
         "IndexASLaunchConfig": {
               "Type": "AWS::AutoScaling::LaunchConfiguration",
               "Metadata": {
@@ -1479,6 +1440,8 @@
                                     "",
                                     [
                                         "#!/bin/bash -v\n",
+                                        "sleep 300\n",
+                                        "yum check-update\n",
                                         "yum install -y libffi-devel openssl-devel python-pip\n",
                                         "pip install pyopenssl ndg-httpsclient pyasn1\n",
                                         "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
@@ -1577,7 +1540,7 @@
                                         },
                                         "/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/723955/chef-alfresco.tar.gz\n",
+                                        "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
@@ -1585,13 +1548,18 @@
                                         "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                         "mkdir /opt/alflicense\n",
                                         "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                        "mkdir /root/.aws/\n",
                                         "echo [default] > /root/.aws/config\n",
                                         "echo region = ",
                                         {
                                             "Ref": "AWS::Region"
                                         },
                                         " >> /root/.aws/config\n",
-                                        "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n"
+                                        "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
+                                        "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
+                                        "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
+                                        "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Index|awk -F\" '{ print $4 }' )\n",
+                                        "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                                     ]
                                 ]
                             }
@@ -1678,14 +1646,14 @@
                       "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                       "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
                       "Cooldown":"900",
-                      "DesiredCapacity":"2",
+                      "DesiredCapacity":"1",
                       "HealthCheckGracePeriod":"900",
                       "HealthCheckType":"EC2",
                       "LaunchConfigurationName":{
                          "Ref":"IndexASLaunchConfig"
                       },
                       "MaxSize":"4",
-                      "MinSize":"2",
+                      "MinSize":"1",
                       "NotificationConfiguration":{
                          "TopicARN":{
                             "Ref":"NotificationTopic"
@@ -1765,6 +1733,7 @@
         },
         "S3Bucket":{
             "Type" : "AWS::S3::Bucket",
+            "DeletionPolicy" : "Delete",
             "Properties": {
               "BucketName": {"Ref":"S3BucketName"},
               "AccessControl": "BucketOwnerFullControl"
@@ -1870,7 +1839,7 @@
     },
     "Outputs": {
       "AlfrescoServerOutput": {
-        "Description": "URL to the ELB serving the Alfresco Share login page:",
+        "Description": "Wait for 15 more minutes and then go URL below to the ELB serving the Alfresco Share login page:",
           "Value": {
             "Fn::Join": [
                 "",
