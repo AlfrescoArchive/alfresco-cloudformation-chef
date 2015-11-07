@@ -7,7 +7,7 @@
             "Description": "Name of an existing EC2 KeyPair, all instances will launch with this KeyPair"
         },
         "AlfrescoInstanceType": {
-            "Default": "m4.xlarge",
+            "Default": "m4.large",
             "Description": "Type of EC2 instance for the Alfresco instances (Share + Repository)",
             "Type": "String",
             "AllowedValues": [
@@ -28,7 +28,7 @@
                 "db.m1.small",
                 "db.m3.medium",
                 "db.t2.medium",
-                "db.m1.medium",
+                "db.m1.medium"
             ],
             "ConstraintDescription": "Must contain valid RDS instance type"
         },
@@ -122,6 +122,7 @@
                 "CidrBlock": {
                     "Fn::FindInMap": [
                         "SubnetConfig",
+                        "Alfresco",
                         "CIDR"
                     ]
                 },
@@ -219,7 +220,7 @@
                 "DBSubnetGroupDescription": "description",
                 "SubnetIds": [
                     {
-                        "Ref": "RDSSubnet"
+                        "Ref": "AlfrescoSubnet"
                     }
                 ]
             }
@@ -227,9 +228,6 @@
         "RDSSecurityGroup": {
             "Type": "AWS::RDS::DBSecurityGroup",
             "Properties": {
-                "EC2VpcId": {
-                    "Ref": "VPC"
-                },
                 "GroupDescription": "Allow AlfrescoSecurityGroup access to RDS DB",
                 "DBSecurityGroupIngress": [
                     {
@@ -285,16 +283,12 @@
                   {
                       "IpProtocol": "tcp",
                       "FromPort": "80",
-                      "ToPort": "80",
-                      "SourceSecurityGroupId": {
-                          "Ref": "ELBSecurityGroup"
-                      }
+                      "ToPort": "80"
                   },
                   {
                       "IpProtocol": "tcp",
                       "FromPort": "443",
-                      "ToPort": "443",
-                      "SourceSecurityGroupId": "0.0.0.0/0"
+                      "ToPort": "443"
                 }],
                 "SecurityGroupEgress": [
                     {
