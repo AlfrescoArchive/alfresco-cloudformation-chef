@@ -1,0 +1,321 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "** Version 2.0 ** This template will run an Alfresco allinone server",
+    "Parameters": {
+        "KeyName": {
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "Description": "Name of an existing EC2 KeyPair, all instances will launch with this KeyPair"
+        },
+        "AlfrescoInstanceType": {
+            "Default": "m4.xlarge",
+            "Description": "Type of EC2 instance for the Alfresco instances (Share + Repository)",
+            "Type": "String",
+            "AllowedValues": [
+                "t2.large",
+                "m4.large",
+                "m3.large",
+                "c4.large",
+                "c3.large",
+                "r3.large"
+            ],
+            "ConstraintDescription": "Must contain valid instance type"
+        },
+        "RDSInstanceType": {
+            "Default": "db.m1.small",
+            "Description": "Type of EC2 instance for the MySQL DB instances",
+            "Type": "String",
+            "AllowedValues": [
+                "db.m1.small",
+                "db.m3.medium",
+                "db.t2.medium",
+                "db.m1.medium",
+            ],
+            "ConstraintDescription": "Must contain valid RDS instance type"
+        },
+        "RDSDBName": {
+            "Default": "alfresco",
+            "Type": "String",
+            "Description": "DB Name for the RDS MySQL database"
+        },
+        "RDSUsername": {
+            "Default": "alfresco",
+            "Type": "String",
+            "Description": "Username for the RDS MySQL database"
+        },
+        "RDSPassword": {
+            "Default": "alfresco",
+            "Type": "String",
+            "Description": "Password for the RDS MySQL database, by default: alfresco",
+            "NoEcho": "TRUE"
+        },
+        "S3BucketName": {
+            "Type": "String",
+            "Default": "your-company-unique-name-alf-12345",
+            "Description": "Name of the S3 bucket that Alfresco should use to store data. Note: This bucket will be created, enter a unique name"
+        },
+        "AlfrescoPassword": {
+            "Type": "String",
+            "Description": "Password for the Alfresco admin user, default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
+            "Default": "admin",
+            "NoEcho": "TRUE"
+        },
+        "AlfrescoTrialLicense": {
+            "Type": "String",
+            "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have one, please ask for it to your Sales representative or to Alfresco Support via http://support.alfresco.com",
+            "Default": "type a public URL here, i.e. a S3 url with your license"
+        },
+        "ArtifactRepoUsername": {
+            "Type": "String",
+            "Default": "maven-enterprise-trial",
+            "Description": "Username for the Alfresco artifact repository. Leave this value by default."
+        },
+        "ArtifactRepoPassword": {
+            "Type": "String",
+            "Description": "Password for the Alfresco artifact repository user. Leave this value by default.",
+            "Default": "trialuser",
+            "NoEcho": "TRUE"
+        }
+    },
+    "Mappings": {
+        "ALINUXAMI": {
+            "us-east-1": {
+                "AMI": "ami-96a818fe"
+            },
+            "us-west-1": {
+                "AMI": "ami-6bcfc42e"
+            },
+            "us-west-2": {
+                "AMI": "ami-c7d092f7"
+            },
+            "eu-west-1": {
+                "AMI": "ami-e4ff5c93"
+            },
+            "eu-central-1": {
+                "AMI": "ami-7cc4f661"
+            },
+            "ap-southeast-1": {
+                "AMI": "ami-aea582fc"
+            },
+            "ap-southeast-2": {
+                "AMI": "ami-bd523087"
+            },
+            "ap-northeast-1": {
+                "AMI": "ami-89634988"
+            },
+            "sa-east-1": {
+                "AMI": "ami-bf9520a2"
+            }
+        },
+        "SubnetConfig": {
+            "Alfresco": {
+                "CIDR": "10.0.10.0/27"
+            },
+            "RDS": {
+                "CIDR": "10.0.100.0/24"
+            }
+        }
+    },
+    "Resources": {
+        "AlfrescoSubnet": {
+            "Type": "AWS::EC2::Subnet",
+            "Properties": {
+                "CidrBlock": {
+                    "Fn::FindInMap": [
+                        "SubnetConfig",
+                        "CIDR"
+                    ]
+                },
+                "Tags": [
+                    {
+                        "Key": "Application",
+                        "Value": "Alfresco"
+                    }
+                ]
+            }
+        },
+        "AlfrescoUser": {
+            "Type": "AWS::IAM::User",
+            "Properties": {
+                "Policies": [
+                    {
+                        "PolicyName": "cfn-and-s3",
+                        "PolicyDocument": {
+                            "Statement": [
+                              {
+                                  "Effect": "Allow",
+                                  "Action": "cloudformation:DescribeStackResource",
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": "elasticloadbalancing:*",
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "autoscaling:*"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                    "ec2:*"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "cloudwatch:PutMetricData",
+                                      "cloudwatch:EnableAlarmActions",
+                                      "cloudwatch:PutMetricAlarm"
+                                  ],
+                                  "Resource": "*"
+                              },
+                              {
+                                  "Resource": "*",
+                                    "Action": [
+                                        "s3:List*"
+                                    ],
+                                    "Effect": "Allow"
+                              },
+                              {
+                                  "Effect": "Allow",
+                                  "Action": [
+                                      "s3:*"
+                                  ],
+                                  "Resource": {
+                                      "Fn::Join": [
+                                          "",
+                                          [
+                                              "arn:aws:s3:::",
+                                              {
+                                                  "Ref": "S3Bucket"
+                                              },
+                                              "/*"
+                                          ]
+                                      ]
+                                  }
+                              }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "CfnKeys": {
+            "Type": "AWS::IAM::AccessKey",
+            "Properties": {
+                "UserName": {
+                    "Ref": "AlfrescoUser"
+                }
+            }
+        },
+        "RDSDBSubnetGroup": {
+            "Type": "AWS::RDS::DBSubnetGroup",
+            "Properties": {
+                "DBSubnetGroupDescription": "description",
+                "SubnetIds": [
+                    {
+                        "Ref": "RDSSubnet"
+                    }
+                ]
+            }
+        },
+        "RDSSecurityGroup": {
+            "Type": "AWS::RDS::DBSecurityGroup",
+            "Properties": {
+                "EC2VpcId": {
+                    "Ref": "VPC"
+                },
+                "GroupDescription": "Allow AlfrescoSecurityGroup access to RDS DB",
+                "DBSecurityGroupIngress": [
+                    {
+                        "EC2SecurityGroupId": {
+                            "Ref": "AlfrescoSecurityGroup"
+                        }
+                    }
+                ]
+            }
+        },
+        "RDSDBInstance": {
+            "Type": "AWS::RDS::DBInstance",
+            "Properties": {
+                "MultiAZ": "true",
+                "DBSecurityGroups": [
+                    {
+                        "Ref": "RDSSecurityGroup"
+                    }
+                ],
+                "AllocatedStorage": "5",
+                "DBInstanceClass": {
+                    "Ref": "RDSInstanceType"
+                },
+                "Engine": "MySQL",
+                "MasterUsername": {
+                    "Ref": "RDSUsername"
+                },
+                "MasterUserPassword": {
+                    "Ref": "RDSPassword"
+                },
+                "DBSubnetGroupName": {
+                    "Ref": "RDSDBSubnetGroup"
+                },
+                "DBName": {
+                    "Ref": "RDSDBName"
+                }
+            },
+            "DeletionPolicy": "Snapshot"
+        },
+        "S3Bucket":{
+            "Type" : "AWS::S3::Bucket",
+            "DeletionPolicy" : "Delete",
+            "Properties": {
+              "BucketName": {"Ref":"S3BucketName"},
+              "AccessControl": "BucketOwnerFullControl"
+            }
+        },
+        "AlfrescoSecurityGroup": {
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+                "GroupDescription": "Allow access to the Alfresco One instances",
+                "SecurityGroupIngress": [
+                  {
+                      "IpProtocol": "tcp",
+                      "FromPort": "80",
+                      "ToPort": "80",
+                      "SourceSecurityGroupId": {
+                          "Ref": "ELBSecurityGroup"
+                      }
+                  },
+                  {
+                      "IpProtocol": "tcp",
+                      "FromPort": "443",
+                      "ToPort": "443",
+                      "SourceSecurityGroupId": "0.0.0.0/0"
+                }],
+                "SecurityGroupEgress": [
+                    {
+                        "IpProtocol": "tcp",
+                        "FromPort": "0",
+                        "ToPort": "65535",
+                        "CidrIp": "0.0.0.0/0"
+                    }
+                ]
+            }
+        }
+    },
+    "Outputs": {
+      "AlfrescoServerOutput": {
+        "Description": "Wait for 15 more minutes and then go URL below to the ELB serving the Alfresco Share login page:",
+          "Value": {
+            "Fn::Join": [
+                "",
+                [ "http://alfserver-public-name", "/share" ]
+            ]
+        }
+    }
+  }
+}
