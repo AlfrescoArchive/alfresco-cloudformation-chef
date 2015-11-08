@@ -2,17 +2,14 @@
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "** Version 2.0 ** This template will run an Alfresco allinone server",
     "Parameters": {
-        "KeyName": {
-            "Type": "AWS::EC2::KeyPair::KeyName",
-            "Description": "Name of an existing EC2 KeyPair, all instances will launch with this KeyPair"
-        },
         "AlfrescoInstanceType": {
-            "Default": "m4.large",
+            "Default": "m3.medium",
             "Description": "Type of EC2 instance for the Alfresco instances (Share + Repository)",
             "Type": "String",
             "AllowedValues": [
                 "t2.large",
                 "m4.large",
+                "m3.medium",
                 "m3.large",
                 "c4.large",
                 "c3.large",
@@ -80,60 +77,10 @@
         "ALINUXAMI": {
             "us-east-1": {
                 "AMI": "ami-96a818fe"
-            },
-            "us-west-1": {
-                "AMI": "ami-6bcfc42e"
-            },
-            "us-west-2": {
-                "AMI": "ami-c7d092f7"
-            },
-            "eu-west-1": {
-                "AMI": "ami-e4ff5c93"
-            },
-            "eu-central-1": {
-                "AMI": "ami-7cc4f661"
-            },
-            "ap-southeast-1": {
-                "AMI": "ami-aea582fc"
-            },
-            "ap-southeast-2": {
-                "AMI": "ami-bd523087"
-            },
-            "ap-northeast-1": {
-                "AMI": "ami-89634988"
-            },
-            "sa-east-1": {
-                "AMI": "ami-bf9520a2"
-            }
-        },
-        "SubnetConfig": {
-            "Alfresco": {
-                "CIDR": "10.0.10.0/27"
-            },
-            "RDS": {
-                "CIDR": "10.0.100.0/24"
             }
         }
     },
     "Resources": {
-        "AlfrescoSubnet": {
-            "Type": "AWS::EC2::Subnet",
-            "Properties": {
-                "CidrBlock": {
-                    "Fn::FindInMap": [
-                        "SubnetConfig",
-                        "Alfresco",
-                        "CIDR"
-                    ]
-                },
-                "Tags": [
-                    {
-                        "Key": "Application",
-                        "Value": "Alfresco"
-                    }
-                ]
-            }
-        },
         "AlfrescoUser": {
             "Type": "AWS::IAM::User",
             "Properties": {
@@ -214,17 +161,6 @@
                 }
             }
         },
-        "RDSDBSubnetGroup": {
-            "Type": "AWS::RDS::DBSubnetGroup",
-            "Properties": {
-                "DBSubnetGroupDescription": "description",
-                "SubnetIds": [
-                    {
-                        "Ref": "AlfrescoSubnet"
-                    }
-                ]
-            }
-        },
         "RDSSecurityGroup": {
             "Type": "AWS::RDS::DBSecurityGroup",
             "Properties": {
@@ -258,9 +194,6 @@
                 "MasterUserPassword": {
                     "Ref": "RDSPassword"
                 },
-                "DBSubnetGroupName": {
-                    "Ref": "RDSDBSubnetGroup"
-                },
                 "DBName": {
                     "Ref": "RDSDBName"
                 }
@@ -289,15 +222,7 @@
                       "IpProtocol": "tcp",
                       "FromPort": "443",
                       "ToPort": "443"
-                }],
-                "SecurityGroupEgress": [
-                    {
-                        "IpProtocol": "tcp",
-                        "FromPort": "0",
-                        "ToPort": "65535",
-                        "CidrIp": "0.0.0.0/0"
-                    }
-                ]
+                }]
             }
         },
         "SetupRole": {
@@ -402,9 +327,6 @@
         "AlfrescoInstance" : {
           "Type" : "AWS::EC2::Instance",
           "Properties" : {
-            "KeyName": {
-              "Ref": "KeyName"
-            },
             "ImageId" : {
               "Fn::FindInMap": [
                 "ALINUXAMI",
