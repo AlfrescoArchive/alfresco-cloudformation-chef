@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage, a local cache on ephemeral volumes, and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except Frankfurt and GovCloud**",
+    "Description": "** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except Frankfurt and GovCloud**",
     "Parameters": {
         "KeyName": {
             "Type": "AWS::EC2::KeyPair::KeyName",
@@ -158,7 +158,7 @@
         },
         "AlfrescoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco admin user, default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
+            "Description": "Password for the Alfresco admin user in MD4 format. Default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
             "Default": "209c6174da490caeb422f3fa5a7ae634",
             "NoEcho": "TRUE"
         },
@@ -1240,14 +1240,13 @@
                                 },
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                 "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
                                 "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
-                                "mkdir /opt/alflicense\n",
-                                "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                "mkdir -p /usr/share/tomcat-alfresco/alflicense\n",
+                                "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /usr/share/tomcat-alfresco/alflicense/license.lic\n",
                                 "semanage port -a -t http_port_t -p tcp 2100\n",
                                 "semanage permissive -a httpd_t\n",
                                 "semanage permissive -a haproxy_t\n",
@@ -1348,7 +1347,7 @@
                "Properties":{
                   "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                   "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
-                  "Cooldown":"900",
+                  "Cooldown":"600",
                   "DesiredCapacity":"1",
                   "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
@@ -1545,14 +1544,13 @@
                                         },
                                         "/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                         "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
                                         "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
-                                        "mkdir /opt/alflicense\n",
-                                        "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /opt/alflicense/license.lic\n",
+                                        "mkdir -p /usr/share/tomcat-alfresco/alflicense\n",
+                                        "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /usr/share/tomcat-alfresco/alflicense/license.lic\n",
                                         "mkdir /root/.aws/\n",
                                         "echo [default] > /root/.aws/config\n",
                                         "echo region = ",
@@ -1651,7 +1649,7 @@
                    "Properties":{
                       "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                       "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
-                      "Cooldown":"900",
+                      "Cooldown":"600",
                       "DesiredCapacity":"1",
                       "HealthCheckGracePeriod":"900",
                       "HealthCheckType":"EC2",
@@ -1869,7 +1867,7 @@
     },
     "Outputs": {
       "AlfrescoServerOutput": {
-        "Description": "Wait for 15 more minutes and then go URL below to the ELB serving the Alfresco Share login page:",
+        "Description": "Wait for 15 more minutes to let Alfresco and Index server to finish the installation process. Then go URL below to the ELB serving the Alfresco Share login page:",
           "Value": {
             "Fn::Join": [
                 "",
