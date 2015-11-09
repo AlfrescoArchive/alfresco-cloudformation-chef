@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage, a local cache on ephemeral volumes, and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
+    "Description": "** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage, a local cache on ephemeral volumes, and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except Frankfurt and GovCloud**",
     "Parameters": {
         "KeyName": {
             "Type": "AWS::EC2::KeyPair::KeyName",
@@ -159,7 +159,7 @@
         "AlfrescoPassword": {
             "Type": "String",
             "Description": "Password for the Alfresco admin user, default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
-            "Default": "admin",
+            "Default": "209c6174da490caeb422f3fa5a7ae634",
             "NoEcho": "TRUE"
         },
         "AlfrescoTrialLicense": {
@@ -695,12 +695,8 @@
             "Type": "AWS::ElasticLoadBalancing::LoadBalancer",
             "Properties": {
                 "Subnets": [
-                    {
-                        "Ref": "AlfrescoSubnet1"
-                    },
-                    {
-                        "Ref": "AlfrescoSubnet2"
-                    }
+                    { "Ref": "NATSubnet1" },
+                    { "Ref": "NATSubnet2" }
                 ],
                 "SecurityGroups": [
                     {
@@ -1140,9 +1136,9 @@
                             "",
                             [
                                 "#!/bin/bash -v\n",
-                                "yum check-update\n",
-                                "yum install -y libffi-devel openssl-devel python-pip\n",
-                                "pip install pyopenssl ndg-httpsclient pyasn1\n",
+                                "/usr/bin/yum check-update\n",
+                                "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
+                                "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
@@ -1238,6 +1234,11 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "/g' /etc/chef/attributes.json\n",
+                                "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                {
+                                    "Ref": "AlfrescoPassword"
+                                },
+                                "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
@@ -1256,12 +1257,11 @@
                                 {
                                     "Ref": "AWS::Region"
                                 },
-
                                 " >> /root/.aws/config\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
-                                "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Alfresco|awk -F\" '{ print $4 }' )\n",
+                                "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Alfresco|awk -F\\\" '{ print $4 }')\n",
                                 "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                             ]
                         ]
@@ -1441,9 +1441,9 @@
                                     [
                                         "#!/bin/bash -v\n",
                                         "sleep 300\n",
-                                        "yum check-update\n",
-                                        "yum install -y libffi-devel openssl-devel python-pip\n",
-                                        "pip install pyopenssl ndg-httpsclient pyasn1\n",
+                                        "/usr/bin/yum check-update\n",
+                                        "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
+                                        "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
                                         "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                         "/usr/bin/cfn-init",
                                         "    --stack ",
@@ -1539,6 +1539,11 @@
                                             "Ref": "AWS::Region"
                                         },
                                         "/g' /etc/chef/attributes.json\n",
+                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                        {
+                                            "Ref": "AlfrescoPassword"
+                                        },
+                                        "/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                         "export COOKBOOKS_TARBALL_URL=https://dl.dropboxusercontent.com/u/357018/chef-alfresco.tar.gz\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
@@ -1556,9 +1561,10 @@
                                         },
                                         " >> /root/.aws/config\n",
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
+                                        "aws ec2 create-tags --resources $(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id) --tags Key=haproxy-role,Value=solr\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
-                                        "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Index|awk -F\" '{ print $4 }' )\n",
+                                        "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Index|awk -F\\\" '{ print $4 }' )\n",
                                         "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                                     ]
                                 ]
@@ -1763,10 +1769,10 @@
                           "Ref": "ELBSecurityGroup"
                       }
                   },
-                    {
+                  {
                         "IpProtocol": "tcp",
-                        "FromPort": "5666",
-                        "ToPort": "5666",
+                        "FromPort": "5701",
+                        "ToPort": "5701",
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "SubnetConfig",
@@ -1774,11 +1780,11 @@
                                 "CIDR"
                             ]
                         }
-                    },
-                    {
+                  },
+                  {
                         "IpProtocol": "tcp",
-                        "FromPort": "5666",
-                        "ToPort": "5666",
+                        "FromPort": "5701",
+                        "ToPort": "5701",
                         "CidrIp": {
                             "Fn::FindInMap": [
                                 "SubnetConfig",
@@ -1786,8 +1792,32 @@
                                 "CIDR"
                             ]
                         }
-                    },
-                    {
+                  },
+                  {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8090",
+                        "ToPort": "8090",
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "SubnetConfig",
+                                "Alfresco1",
+                                "CIDR"
+                            ]
+                        }
+                  },
+                  {
+                        "IpProtocol": "tcp",
+                        "FromPort": "8090",
+                        "ToPort": "8090",
+                        "CidrIp": {
+                            "Fn::FindInMap": [
+                                "SubnetConfig",
+                                "Alfresco2",
+                                "CIDR"
+                            ]
+                        }
+                  },
+                  {
                         "IpProtocol": "tcp",
                         "FromPort": "22",
                         "ToPort": "22",
@@ -1805,8 +1835,8 @@
                                 ]
                             ]
                         }
-                    },
-                    {
+                  },
+                  {
                         "IpProtocol": "tcp",
                         "FromPort": "22",
                         "ToPort": "22",
@@ -1824,7 +1854,7 @@
                                 ]
                             ]
                         }
-                    }
+                  }
                 ],
                 "SecurityGroupEgress": [
                     {
