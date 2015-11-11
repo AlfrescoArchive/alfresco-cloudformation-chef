@@ -1078,30 +1078,6 @@
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "config": {
-                      "files":{
-                        "/root/.awssecret":{
-                           "content":{
-                              "Fn::Join":[
-                                 "",
-                                 [
-                                    {
-                                       "Ref":"CfnKeys"
-                                    },
-                                    "\n",
-                                    {
-                                       "Fn::GetAtt":[
-                                          "CfnKeys",
-                                          "SecretAccessKey"
-                                       ]
-                                    }
-                                 ]
-                              ]
-                           },
-                           "mode":"000600",
-                           "owner":"root",
-                           "group":"root"
-                        }
-                      }
                 }
               }
             },
@@ -1135,7 +1111,7 @@
                         "Fn::Join": [
                             "",
                             [
-                                "#!/bin/bash -v\n",
+                                "#!/bin/bash -x\n",
                                 "/usr/bin/yum check-update\n",
                                 "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
                                 "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
@@ -1241,8 +1217,8 @@
                                 "/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
-                                "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
-                                "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
+                                "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
+                                "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
                                 "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
                                 "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
                                 "mkdir -p /usr/share/tomcat-alfresco/alflicense\n",
@@ -1345,8 +1321,8 @@
         "AlfrescoAutoScalingGroup":{
                "Type":"AWS::AutoScaling::AutoScalingGroup",
                "Properties":{
-                  "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
-                  "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
+                  "AvailabilityZones": [ { "Ref":"AZ2", "Ref":"AZ1" } ],
+                  "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet2", "Ref":"AlfrescoSubnet1" } ],
                   "Cooldown":"600",
                   "DesiredCapacity":"1",
                   "HealthCheckGracePeriod":"900",
@@ -1381,30 +1357,6 @@
               "Metadata": {
                         "AWS::CloudFormation::Init": {
                             "config": {
-                              "files":{
-                                "/root/.awssecret":{
-                                   "content":{
-                                      "Fn::Join":[
-                                         "",
-                                         [
-                                            {
-                                               "Ref":"CfnKeys"
-                                            },
-                                            "\n",
-                                            {
-                                               "Fn::GetAtt":[
-                                                  "CfnKeys",
-                                                  "SecretAccessKey"
-                                               ]
-                                            }
-                                         ]
-                                      ]
-                                   },
-                                   "mode":"000600",
-                                   "owner":"root",
-                                   "group":"root"
-                                }
-                              }
                             }
                         }
                     },
@@ -1438,10 +1390,9 @@
                                 "Fn::Join": [
                                     "",
                                     [
-                                        "#!/bin/bash -v\n",
-                                        "sleep 300\n",
+                                        "#!/bin/bash -x\n",
                                         "/usr/bin/yum check-update\n",
-                                        "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
+                                        "/usr/bin/yum install -y libffi-devel openssl-devel python-pip mysql\n",
                                         "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
                                         "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                         "/usr/bin/cfn-init",
@@ -1558,8 +1509,9 @@
                                             "Ref": "AWS::Region"
                                         },
                                         " >> /root/.aws/config\n",
+                                        "mysql -u ", { "Ref": "RDSUsername" }, " -p", { "Ref": "RDSPassword" }, " -h ", { "Fn::GetAtt": [ "RDSDBInstance", "Endpoint.Address" ] }," -e \"desc ", { "Ref": "RDSDBName" }, ".alf_server\" > /dev/null 2>&1\n",
+                                        "if [ $? == 1 ]; then sleep 300; fi\n",
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
-                                        "aws ec2 create-tags --resources $(wget -q -O - http://169.254.169.254/latest/meta-data/instance-id) --tags Key=haproxy-role,Value=solr\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                         "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Index|awk -F\\\" '{ print $4 }' )\n",
@@ -1647,8 +1599,8 @@
         "IndexAutoScalingGroup":{
                    "Type":"AWS::AutoScaling::AutoScalingGroup",
                    "Properties":{
-                      "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
-                      "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
+                      "AvailabilityZones": [ { "Ref":"AZ2", "Ref":"AZ1" } ],
+                      "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet2", "Ref":"AlfrescoSubnet1" } ],
                       "Cooldown":"600",
                       "DesiredCapacity":"1",
                       "HealthCheckGracePeriod":"900",
@@ -1674,6 +1626,11 @@
                          {
                             "Key":"Name",
                             "Value":"Alfresco Index Server node",
+                            "PropagateAtLaunch":"true"
+                         },
+                         {
+                            "Key":"haproxy-role",
+                            "Value":"solr",
                             "PropagateAtLaunch":"true"
                          }
                       ]
@@ -1864,16 +1821,25 @@
                 ]
             }
         }
-    },
+  },
     "Outputs": {
       "AlfrescoServerOutput": {
-        "Description": "Wait for 15 more minutes to let Alfresco and Index server to finish the installation process. Then go URL below to the ELB serving the Alfresco Share login page:",
+        "Description": "Please, wait for 15 more minutes to let Alfresco and Index server to finish the installation process. Then go to the URL below to the ELB serving the Alfresco Share login page:",
           "Value": {
             "Fn::Join": [
                 "",
                 [ "http://", { "Fn::GetAtt": [ "ElasticLoadBalancer", "DNSName" ] }, "/share" ]
             ]
         }
+      },
+      "AlfrescoAwsReadMoreInfo": {
+        "Description": "For more information and details visit:",
+          "Value": {
+            "Fn::Join": [
+              "",
+              [ "https://github.com/Alfresco/alfresco-cloudformation-chef" ]
+          ]
+      }
     }
   }
 }
