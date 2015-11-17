@@ -603,7 +603,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": [ { "Ref" : "AWS::StackName" }, "NAT Instance 1" ]
+                        "Value": "NAT Instance 1"
                     }
                 ],
                 "InstanceType": {
@@ -637,7 +637,7 @@
                 "Tags": [
                     {
                         "Key": "Name",
-                        "Value": [ { "Ref" : "AWS::StackName" }, "NAT Instance 2" ]
+                        "Value": "NAT Instance 2"
                     }
                 ],
                 "InstanceType": {
@@ -1346,7 +1346,7 @@
                   "Tags":[
                      {
                         "Key":"Name",
-                        "Value": [ { "Ref" : "AWS::StackName" }, "Alfresco Server cluster node" ],
+                        "Value": "Alfresco Server cluster node",
                         "PropagateAtLaunch":"true"
                      }
                   ]
@@ -1625,7 +1625,7 @@
                       "Tags":[
                          {
                             "Key":"Name",
-                            "Value":[ { "Ref" : "AWS::StackName" }, "Alfresco Index Server node" ],
+                            "Value":"Alfresco Index Server node",
                             "PropagateAtLaunch":"true"
                          },
                          {
