@@ -496,11 +496,11 @@
                     },
                     {
                         "IpProtocol": "tcp", "FromPort": "80", "ToPort": "80",
-                        "CidrIp": "0.0.0.0/0"
+                        "CidrIp": "10.0.0.0/16"
                     },
                     {
                         "IpProtocol": "tcp", "FromPort": "443", "ToPort": "443",
-                        "CidrIp": "0.0.0.0/0"
+                        "CidrIp": "10.0.0.0/16"
                     }
                 ],
                 "SecurityGroupEgress": [
@@ -1236,7 +1236,7 @@
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
-                                "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Alfresco|awk -F\\\" '{ print $4 }')\n",
+                                "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
                                 "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                             ]
                         ]
@@ -1514,7 +1514,7 @@
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
-                                        "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep Index|awk -F\\\" '{ print $4 }' )\n",
+                                        "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
                                         "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size 2 --max-size 4 --desired-capacity 2 --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                                     ]
                                 ]
@@ -1824,7 +1824,7 @@
   },
     "Outputs": {
       "AlfrescoServerOutput": {
-        "Description": "Please, wait for 15 more minutes to let Alfresco and Index server to finish the installation process. Then go to the URL below to the ELB serving the Alfresco Share login page:",
+        "Description": "Please, wait for 15 minutes or to let Alfresco and Index server to finish the installation and scaling process. Then go to the URL below to the ELB serving the Alfresco Share login page:",
           "Value": {
             "Fn::Join": [
                 "",
