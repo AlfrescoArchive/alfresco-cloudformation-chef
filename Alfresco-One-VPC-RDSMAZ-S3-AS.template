@@ -1826,7 +1826,7 @@
   },
     "Outputs": {
       "AlfrescoServerOutput": {
-        "Description": "Please, wait for 15 minutes or to let Alfresco and Index server to finish the installation and scaling process. Then go to the URL below to the ELB serving the Alfresco Share login page:",
+        "Description": "Please, wait for 15 minutes or more to let Alfresco and Index server to finish the installation and scaling process. Then go to the URL below to the ELB serving the Alfresco Share login page:",
           "Value": {
             "Fn::Join": [
                 "",
