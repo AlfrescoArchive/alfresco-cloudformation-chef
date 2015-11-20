@@ -3,19 +3,28 @@ Alfresco CloudFormation Template with Chef
 
 *Disclaimer:* This CloudFormation template is still in early development and should be considered for illustrative/educational purposes only. No warranty is expressed or implied. Improvements and any other contributions are encouraged and appreciated.
 
-Overview (TO UPDATE)
+Overview
 --------------------
 
-This template will instantiate a 2-node Alfresco cluster with the following capabilities:
-* All Alfresco nodes will be placed inside a Virtual Private Cloud (VPC).
+This template will instantiate a 2-node Alfresco cluster with 2 dedicated Index servers the following capabilities:
+* All Alfresco and Index nodes will be placed inside a Virtual Private Cloud (VPC).
 * An Elastic Load Balancer instance with "sticky" sessions based on the Tomcat JSESSIONID.
 * Shared S3 ContentStore
 * MySQL database on RDS instances.
-* Each Alfresco node will be in a separate Availability Zone.
-* Auto-scaling roles that will add extra Alfresco nodes when certain performance thresholds are reached.
+* Each Alfresco and Index node will be in a separate Availability Zone.
+* Auto-scaling roles that will add extra Alfresco and Index nodes when certain performance thresholds are reached.
 
-Basic Usage (TO UPDATE)
+Basic Usage
 -----------
+There are a number of tasks that you must complete as part of the deployment. Before launching the AWS CloudFormation template, you must:
+* Create an Amazon EC2 key pair
+The Amazon EC2 key pair provides SSH access to the instances created by the AWS CloudFormation template. If you already have a key pair you would like to use, you can skip this step.  
+To create a key pair, use the instructions on https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html.
+
+* Accept terms to use the CentOS 7 AMI from the AWS Market
+
+Alfresco and its index servers use CentOS 7 as base operating systems for this environment. To be able to use the CentOS 7 AMI, accept the use conditions from this page (login to your AWS account): https://aws.amazon.com/marketplace/pp/B00O7WM7QW/ref=sp_mpg_product_title?ie=UTF8&sr=0-10 
+Click Continue. You’ll then see the Launch on EC2 page. Finally, select the Manual Launch tab, and then click Accept Terms.
 
 * Launch the [AWS Console](http://aws.amazon.com/console/cloudformation)
 * Click *Create Stack*.
@@ -27,6 +36,9 @@ Basic Usage (TO UPDATE)
 	* Provide the logins and passwords for the database and Alfresco admin accounts. These accounts and passwords will be created & set by the template.
 	* Ensure you set the correct EC2 key.
 * Click *Continue* and finish the wizard.
+
+
+
 
 Tips (TO UPDATE)
 ----
