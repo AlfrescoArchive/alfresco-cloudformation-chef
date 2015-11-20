@@ -15,6 +15,8 @@ This template will instantiate a 2-node Alfresco cluster with 2 dedicated Index 
 * MySQL database on RDS instances.
 * Each Alfresco and Index node will be in a separate Availability Zone.
 * Auto-scaling roles that will add extra Alfresco and Index nodes when certain performance thresholds are reached.
+* Result of the AWS CloudFormation template deployment:
+![AWS Alfresco diagram](img/aws-alfresco.png "AWS Alfresco Diagram")
 
 Basic Usage
 -----------
@@ -43,6 +45,8 @@ Tips
 * Use the *Events* tab to review status and any errors.
 * Once the environment starts, use the *Output* tab to get the URL of the load-balancer.
 * If stack deletion does not complete and the *Events* show an error related to VPC, login to the VPC console and delete the corresponding VPC; then delete the stack again.
+* Internals of the deployment:
+![AWS Alfresco diagram internals](img/aws-alfresco-inside.png "AWS Alfresco diagram internals")
 
 License
 -------
