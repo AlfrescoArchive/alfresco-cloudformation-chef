@@ -46,7 +46,7 @@ Tips
 * Once the environment starts, use the *Output* tab to get the URL of the load-balancer.
 * If stack deletion does not complete and the *Events* show an error related to VPC, login to the VPC console and delete the corresponding VPC; then delete the stack again.
 * Internals of the deployment:
-![AWS Alfresco diagram internals](img/aws-alfresco-internal.png "AWS Alfresco diagram internals")
+![AWS Alfresco diagram internals](img/aws-alfresco-inside.png "AWS Alfresco diagram internals")
 
 License
 -------
