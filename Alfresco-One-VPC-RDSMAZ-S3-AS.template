@@ -106,12 +106,12 @@
             "ConstraintDescription": "Must contain valid instance type"
         },
         "RDSInstanceType": {
-            "Default": "db.m1.small",
+            "Default": "db.t2.small",
             "Description": "Type of EC2 instance for the MySQL DB instances",
             "Type": "String",
             "AllowedValues": [
-                "db.t1.micro",
-                "db.m1.small",
+                "db.t2.medium",
+                "db.t2.large",
                 "db.m3.medium",
                 "db.m3.large",
                 "db.m3.xlarge",
@@ -125,13 +125,9 @@
                 "db.t2.small",
                 "db.t2.medium",
                 "db.t2.large",
-                "db.m2.xlarge",
-                "db.m2.2xlarge",
-                "db.m2.4xlarge",
-                "db.cr1.8xlarge",
-                "db.m1.medium",
-                "db.m1.large",
-                "db.m1.xlarge"
+                "db.m4.medium",
+                "db.m4.large",
+                "db.m4.xlarge"
             ],
             "ConstraintDescription": "Must contain valid RDS instance type"
         },
@@ -1017,7 +1013,7 @@
         "RDSDBSubnetGroup": {
             "Type": "AWS::RDS::DBSubnetGroup",
             "Properties": {
-                "DBSubnetGroupDescription": "description",
+                "DBSubnetGroupDescription": "Subnets available for the RDS DB Instance",
                 "SubnetIds": [
                     {
                         "Ref": "RDSSubnet1"
@@ -1029,47 +1025,25 @@
             }
         },
         "RDSSecurityGroup": {
-            "Type": "AWS::RDS::DBSecurityGroup",
-            "Properties": {
-                "EC2VpcId": {
-                    "Ref": "VPC"
-                },
-                "GroupDescription": "Allow AlfrescoSecurityGroup access to RDS DB",
-                "DBSecurityGroupIngress": [
-                    {
-                        "EC2SecurityGroupId": {
-                            "Ref": "AlfrescoSecurityGroup"
-                        }
-                    }
-                ]
+            "Type": "AWS::EC2::SecurityGroup",
+            "Properties" :
+            {
+              "GroupDescription" : "Security group for RDS DB Instance.",
+              "VpcId" : { "Ref" : "VPC" }
             }
         },
         "RDSDBInstance": {
             "Type": "AWS::RDS::DBInstance",
             "Properties": {
                 "MultiAZ": "true",
-                "DBSecurityGroups": [
-                    {
-                        "Ref": "RDSSecurityGroup"
-                    }
-                ],
+                "VPCSecurityGroups": [ { "Ref": "RDSSecurityGroup" } ],
                 "AllocatedStorage": "5",
-                "DBInstanceClass": {
-                    "Ref": "RDSInstanceType"
-                },
+                "DBInstanceClass": { "Ref": "RDSInstanceType" },
                 "Engine": "MySQL",
-                "MasterUsername": {
-                    "Ref": "RDSUsername"
-                },
-                "MasterUserPassword": {
-                    "Ref": "RDSPassword"
-                },
-                "DBSubnetGroupName": {
-                    "Ref": "RDSDBSubnetGroup"
-                },
-                "DBName": {
-                    "Ref": "RDSDBName"
-                }
+                "MasterUsername": { "Ref": "RDSUsername" },
+                "MasterUserPassword": { "Ref": "RDSPassword" },
+                "DBSubnetGroupName": { "Ref": "RDSDBSubnetGroup" },
+                "DBName": { "Ref": "RDSDBName" }
             },
             "DeletionPolicy": "Snapshot"
         },
