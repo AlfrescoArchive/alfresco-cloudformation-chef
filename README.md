@@ -3,7 +3,7 @@ Alfresco CloudFormation Template with Chef
 
 *Disclaimer:* This CloudFormation template should be considered for illustrative/educational purposes only. No warranty is expressed or implied. Improvements and any other contributions are encouraged and appreciated.
 
-*Note:* Extensive documentation about who to use this template is available in http://aws.amazon.com/whitepapers/ 
+*Note:* Extensive documentation about how to use this template is available in http://aws.amazon.com/whitepapers/ 
 
 Overview
 --------------------
