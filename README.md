@@ -5,6 +5,8 @@ Alfresco CloudFormation Template with Chef
 
 *Note:* Extensive documentation about how to use this template is available in http://aws.amazon.com/whitepapers/ 
 
+*Demo:* https://www.youtube.com/watch?v=pwFyVG6XV_o
+
 Overview
 --------------------
 
