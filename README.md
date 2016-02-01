@@ -58,8 +58,8 @@ Main differences between the regular Alfresco CloudFormation Template and the on
 ---------------------------------------------------------------------------------------------------
 * Instance types may differ since GovCloud supports less types than the rest of AWS Regions.
 * Default AMI for GovCloud is RedHat 7 instead of CentOS 7.
-* We use a different configuration json file in our Chef code for RedHat 7 (chef-alfresco 0.6.18, enabled additional yum repos to install libreoffice and pip, added  s3service.s3-endpoint=s3-us-gov-west-1.amazonaws.com to alfresco-global.properties).
-* Login from NAT to the servers is with ec2-user instead of centos in GovCloud because of RedHat 7.
+* We use a different configuration json file in our Chef code for RedHat 7 (chef-alfresco 0.6.18, enabled additional yum repos to install LibreOffice and Python pip, added  s3service.s3-endpoint=s3-us-gov-west-1.amazonaws.com to alfresco-global.properties).
+* Login from NAT to the servers is with ec2-user instead of CentOS in GovCloud because of RedHat 7.
 
 License
 -------
