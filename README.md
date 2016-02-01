@@ -5,7 +5,7 @@ Alfresco CloudFormation Template with Chef
 
 *Notes:*
 * Extensive documentation about how to use this template will be available soon at http://aws.amazon.com
-* There are two templates one for GovCloud and the other for the rest of the AWS Regions. Don't use the GovCloud one unless you have access to AWS GovCloud Region, otherwise it won't work.
+* There are two templates one for GovCloud and the other for the rest of the AWS Regions. Don't use the GovCloud one unless you have got access to AWS GovCloud Region, otherwise it won't work.
 
 *Demo:* Watch a 10 minutes demo here https://www.youtube.com/watch?v=pwFyVG6XV_o
 
