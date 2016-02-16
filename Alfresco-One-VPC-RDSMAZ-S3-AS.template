@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
+    "Description": "(0019) Alfresco One on AWS main template ** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
     "Parameters": {
         "KeyName": {
             "Type": "AWS::EC2::KeyPair::KeyName",

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "** Version 1.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version is only intended to work on AWS GovCloud**",
+    "Description": "(0019) Alfresco One on AWS main template ** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
     "Parameters": {
         "KeyName": {
             "Type": "AWS::EC2::KeyPair::KeyName",
@@ -32,56 +32,64 @@
             "ConstraintDescription": "Must be a valid EC2 Availabilty zone"
         },
         "AlfrescoInstanceType": {
-            "Default": "m3.xlarge",
+            "Default": "m4.xlarge",
             "Description": "Type of EC2 instance for the Alfresco instances (Share + Repository)",
             "Type": "String",
             "AllowedValues": [
+                "t2.medium",
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
                 "m3.medium",
                 "m3.large",
                 "m3.xlarge",
                 "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
                 "c3.large",
                 "c3.xlarge",
                 "c3.2xlarge",
                 "c3.4xlarge",
                 "c3.8xlarge",
                 "r3.large",
-                "r3.xlarge",
-                "r3.2xlarge",
-                "r3.4xlarge",
-                "r3.8xlarge",
-                "i2.xlarge",
-                "i2.2xlarge",
-                "i2.4xlarge",
-                "i2.8xlarge",
-                "hs1.8xlarge"
+                "r3.xlarge"
             ],
             "ConstraintDescription": "Must contain valid instance type"
         },
         "IndexInstanceType": {
-            "Default": "m3.xlarge",
+            "Default": "m4.xlarge",
             "Description": "Type of EC2 instance for the Alfresco Index instances (Solr)",
             "Type": "String",
             "AllowedValues": [
-              "m3.medium",
-              "m3.large",
-              "m3.xlarge",
-              "m3.2xlarge",
-              "c3.large",
-              "c3.xlarge",
-              "c3.2xlarge",
-              "c3.4xlarge",
-              "c3.8xlarge",
-              "r3.large",
-              "r3.xlarge",
-              "r3.2xlarge",
-              "r3.4xlarge",
-              "r3.8xlarge",
-              "i2.xlarge",
-              "i2.2xlarge",
-              "i2.4xlarge",
-              "i2.8xlarge",
-              "hs1.8xlarge"
+                "t2.medium",
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "r3.large",
+                "r3.xlarge"
             ],
             "ConstraintDescription": "Must contain valid instance type"
         },
@@ -98,21 +106,28 @@
             "ConstraintDescription": "Must contain valid instance type"
         },
         "RDSInstanceType": {
-            "Default": "db.m1.small",
+            "Default": "db.t2.small",
             "Description": "Type of EC2 instance for the MySQL DB instances",
             "Type": "String",
             "AllowedValues": [
-                "db.m1.small",
-                "db.m1.medium",
-                "db.m1.large",
-                "db.m1.xlarge",
+                "db.t2.medium",
+                "db.t2.large",
                 "db.m3.medium",
                 "db.m3.large",
                 "db.m3.xlarge",
                 "db.m3.2xlarge",
-                "db.m2.xlarge",
-                "db.m2.2xlarge",
-                "db.m2.4xlarge"
+                "db.r3.large",
+                "db.r3.xlarge",
+                "db.r3.2xlarge",
+                "db.r3.4xlarge",
+                "db.r3.8xlarge",
+                "db.t2.micro",
+                "db.t2.small",
+                "db.t2.medium",
+                "db.t2.large",
+                "db.m4.medium",
+                "db.m4.large",
+                "db.m4.xlarge"
             ],
             "ConstraintDescription": "Must contain valid RDS instance type"
         },
@@ -162,13 +177,61 @@
     },
     "Mappings": {
         "ALINUXAMI": {
-            "us-gov-west-1": {
-                "AMI": "ami-f14120d2"
+            "us-east-1": {
+                "AMI": "ami-96a818fe"
+            },
+            "us-west-1": {
+                "AMI": "ami-6bcfc42e"
+            },
+            "us-west-2": {
+                "AMI": "ami-c7d092f7"
+            },
+            "eu-west-1": {
+                "AMI": "ami-e4ff5c93"
+            },
+            "eu-central-1": {
+                "AMI": "ami-7cc4f661"
+            },
+            "ap-southeast-1": {
+                "AMI": "ami-aea582fc"
+            },
+            "ap-southeast-2": {
+                "AMI": "ami-bd523087"
+            },
+            "ap-northeast-1": {
+                "AMI": "ami-89634988"
+            },
+            "sa-east-1": {
+                "AMI": "ami-bf9520a2"
             }
         },
         "AWSNATAMI": {
-            "us-gov-west-1": {
-                "AMI": "ami-3d197f1e"
+            "us-east-1": {
+                "AMI": "ami-4c9e4b24"
+            },
+            "us-west-1": {
+                "AMI": "ami-2b2b296e"
+            },
+            "us-west-2": {
+                "AMI": "ami-bb69128b"
+            },
+            "eu-west-1": {
+                "AMI": "ami-3760b040"
+            },
+            "eu-central-1": {
+                "AMI": "ami-204c7a3d"
+            },
+            "ap-southeast-1": {
+                "AMI": "ami-b082dae2"
+            },
+            "ap-southeast-2": {
+                "AMI": "ami-996402a3"
+            },
+            "ap-northeast-1": {
+                "AMI": "ami-55c29e54"
+            },
+            "sa-east-1": {
+                "AMI": "ami-b972dba4"
             }
         },
         "SubnetConfig": {
@@ -366,7 +429,7 @@
               "Threshold": "0",
               "AlarmActions": [
                 {
-                  "Fn::Join" : ["", ["arn:aws-us-gov:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
+                  "Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
                 }
                 ],
               "Dimensions": [
@@ -391,7 +454,7 @@
               "Threshold": "0",
               "AlarmActions": [
                 {
-                  "Fn::Join" : ["", ["arn:aws-us-gov:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
+                  "Fn::Join" : ["", ["arn:aws:automate:", { "Ref" : "AWS::Region" }, ":ec2:recover" ]]
                 }
                 ],
               "Dimensions": [
@@ -841,7 +904,7 @@
                                         "Fn::Join": [
                                             "",
                                             [
-                                                "arn:aws-us-gov:s3:::",
+                                                "arn:aws:s3:::",
                                                 {
                                                     "Ref": "S3Bucket"
                                                 },
@@ -924,7 +987,7 @@
                                       "Fn::Join": [
                                           "",
                                           [
-                                              "arn:aws-us-gov:s3:::",
+                                              "arn:aws:s3:::",
                                               {
                                                   "Ref": "S3Bucket"
                                               },
@@ -1033,9 +1096,10 @@
                             "",
                             [
                                 "#!/bin/bash -x\n",
-                                "yum check-update\n",
-                                "rpm -qa > /root/all-packages-before.txt\n",
-                                "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                "/usr/bin/yum check-update\n",
+                                "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
+                                "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
+                                "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
                                 {
@@ -1060,7 +1124,7 @@
                                 "\n",
                                 "export NODE_NAME=share\n",
                                 "mkdir /etc/chef\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}-rh7.json > /etc/chef/attributes.json\n",
+                                "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/${NODE_NAME}.json > /etc/chef/attributes.json\n",
                                 "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
                                 {
                                     "Ref": "ArtifactRepoUsername"
@@ -1135,11 +1199,9 @@
                                     "Ref": "AlfrescoPassword"
                                 },
                                 "/g' /etc/chef/attributes.json\n",
-                                "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
-                                "sed -i \"s/@@JVM_ROUTE@@/share-$INSTANCEIDX/g\" /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "export CHEF_ALFRESCO_VERSION='0.6.21'\n",
-                                "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
+                                "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
                                 "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
@@ -1157,7 +1219,6 @@
                                 },
                                 " >> /root/.aws/config\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
-                                "rpm -qa > /root/all-packages-after.txt\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                 "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
@@ -1249,7 +1310,7 @@
                   "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet2", "Ref":"AlfrescoSubnet1" } ],
                   "Cooldown":"600",
                   "DesiredCapacity":"1",
-                  "HealthCheckGracePeriod":"2500",
+                  "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
                   "LaunchConfigurationName": { "Ref":"AlfrescoASLaunchConfig" },
                   "LoadBalancerNames":[ { "Ref":"ElasticLoadBalancer" } ],
@@ -1314,11 +1375,12 @@
                                 "Fn::Join": [
                                     "",
                                     [
-                                      "#!/bin/bash -x\n",
-                                      "yum check-update\n",
-                                      "rpm -qa > /root/all-packages-before.txt\n",
-                                      "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
-                                      "/usr/bin/cfn-init",
+                                        "#!/bin/bash -x\n",
+                                        "/usr/bin/yum check-update\n",
+                                        "/usr/bin/yum install -y libffi-devel openssl-devel python-pip mysql\n",
+                                        "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
+                                        "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                        "/usr/bin/cfn-init",
                                         "    --stack ",
                                         {
                                            "Ref":"AWS::StackName"
@@ -1342,7 +1404,7 @@
                                         "\n",
                                         "export NODE_NAME=solr\n",
                                         "mkdir /etc/chef\n",
-                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/nodes/${NODE_NAME}-rh7.json > /etc/chef/attributes.json\n",
+                                        "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/${NODE_NAME}.json > /etc/chef/attributes.json\n",
                                         "sed -i 's/@@ARTIFACT_REPO_USERNAME@@/",
                                         {
                                             "Ref": "ArtifactRepoUsername"
@@ -1417,11 +1479,9 @@
                                             "Ref": "AlfrescoPassword"
                                         },
                                         "/g' /etc/chef/attributes.json\n",
-                                        "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
-                                        "sed -i \"s/@@JVM_ROUTE@@/solr-$INSTANCEIDX/g\" /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "export CHEF_ALFRESCO_VERSION='0.6.19'\n",
-                                        "curl -L https://raw.githubusercontent.com/Alfresco/chef-alfresco/master/install-alfresco.sh --no-sessionid | bash -s\n",
+                                        "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
+                                        "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                         "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
@@ -1438,7 +1498,6 @@
                                         "mysql -u ", { "Ref": "RDSUsername" }, " -p", { "Ref": "RDSPassword" }, " -h ", { "Fn::GetAtt": [ "RDSDBInstance", "Endpoint.Address" ] }," -e \"desc ", { "Ref": "RDSDBName" }, ".alf_server\" > /dev/null 2>&1\n",
                                         "if [ $? == 1 ]; then sleep 600; fi\n",
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
-                                        "rpm -qa > /root/list-of-packages-after.txt\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                         "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
