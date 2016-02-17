@@ -150,7 +150,7 @@
         "S3BucketName": {
             "Type": "String",
             "Default": "your-company-unique-name-alf-12345",
-            "Description": "Name of the S3 bucket that Alfresco should use to store data. Note: This bucket will be created, enter a unique name"
+            "Description": "Name of the S3 bucket that Alfresco should use to store data. Note: This bucket will be created, enter a unique name, do not use contain uppercase characters."
         },
         "AlfrescoPassword": {
             "Type": "String",
