@@ -1156,6 +1156,7 @@
                                     "Ref": "AWS::Region"
                                 },
                                 " >> /root/.aws/config\n",
+                                "yum -y install wget\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                 "rpm -qa > /root/all-packages-after.txt\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
@@ -1437,6 +1438,7 @@
                                         " >> /root/.aws/config\n",
                                         "mysql -u ", { "Ref": "RDSUsername" }, " -p", { "Ref": "RDSPassword" }, " -h ", { "Fn::GetAtt": [ "RDSDBInstance", "Endpoint.Address" ] }," -e \"desc ", { "Ref": "RDSDBName" }, ".alf_server\" > /dev/null 2>&1\n",
                                         "if [ $? == 1 ]; then sleep 600; fi\n",
+                                        "yum -y install wget\n",
                                         "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
                                         "rpm -qa > /root/list-of-packages-after.txt\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
