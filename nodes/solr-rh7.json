@@ -30,6 +30,7 @@
         "restart_services" : ["tomcat-alfresco","tomcat-solr"],
         "ssl_enabled" : false,
         "properties" : {
+            "jodconverter.officeHome" : "/usr/lib64/libreoffice",
             "alfresco.cluster.enabled" : false,
             "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",

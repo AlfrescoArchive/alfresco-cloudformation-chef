@@ -39,6 +39,7 @@
         },
         "properties" : {
             "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
+            "jodconverter.officeHome" : "/usr/lib64/libreoffice",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
