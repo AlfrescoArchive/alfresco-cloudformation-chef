@@ -91,5 +91,5 @@
             "enabled" : true
         }
     },
-    "run_list": ["commons::ec2-tagging","alfresco::default"]
+    "run_list": ["commons::ec2-tagging","alfresco::default", "alfresco::redeploy"]
 }
