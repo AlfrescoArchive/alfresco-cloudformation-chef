@@ -1157,6 +1157,8 @@
                                 " >> /root/.aws/config\n",
                                 "yum -y install wget\n",
                                 "cd /etc/chef; chef-client -z -j /etc/chef/attributes.json\n",
+                                "systemctl enable nginx\n",
+                                "systemctl start nginx\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                 "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
