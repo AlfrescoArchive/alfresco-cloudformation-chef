@@ -26,7 +26,7 @@
         "install_fonts" : false,
         "version" : "5.0.2",
         "edition" : "enterprise",
-        "components" : ["tomcat","repo","transform","solr"],
+        "components" : ["tomcat","repo","transform","solr","rm"],
         "restart_services" : ["tomcat-alfresco","tomcat-solr"],
         "ssl_enabled" : false,
         "properties" : {
