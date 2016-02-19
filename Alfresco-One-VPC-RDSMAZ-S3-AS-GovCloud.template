@@ -139,8 +139,8 @@
         },
         "AlfrescoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco admin user in MD4 format. Default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
-            "Default": "209c6174da490caeb422f3fa5a7ae634",
+            "Description": "Password for the Alfresco admin user. Introduce your desired password.",
+            "Default": "",
             "NoEcho": "TRUE"
         },
         "AlfrescoTrialLicense": {
@@ -1129,11 +1129,13 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                "yum -y install coreutils glibc-common openssl\n",
+                                "ALFPASS=$(printf %s ",
                                 {
                                     "Ref": "AlfrescoPassword"
                                 },
-                                "/g' /etc/chef/attributes.json\n",
+                                " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
                                 "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
                                 "sed -i \"s/@@JVM_ROUTE@@/share-$INSTANCEIDX/g\" /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
@@ -1412,11 +1414,13 @@
                                             "Ref": "AWS::Region"
                                         },
                                         "/g' /etc/chef/attributes.json\n",
-                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                        "yum -y install coreutils glibc-common openssl\n",
+                                        "ALFPASS=$(printf %s ",
                                         {
                                             "Ref": "AlfrescoPassword"
                                         },
-                                        "/g' /etc/chef/attributes.json\n",
+                                        " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
                                         "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
                                         "sed -i \"s/@@JVM_ROUTE@@/solr-$INSTANCEIDX/g\" /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",

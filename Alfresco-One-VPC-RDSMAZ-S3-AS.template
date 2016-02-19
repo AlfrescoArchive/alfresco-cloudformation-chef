@@ -154,8 +154,8 @@
         },
         "AlfrescoPassword": {
             "Type": "String",
-            "Description": "Password for the Alfresco admin user in MD4 format. Default is admin or add a MD4 format password, i.e. for admin (printf %s admin | iconv -t utf16le | openssl md4)",
-            "Default": "209c6174da490caeb422f3fa5a7ae634",
+            "Description": "Password for the Alfresco admin user. Introduce your desired password.",
+            "Default": "",
             "NoEcho": "TRUE"
         },
         "AlfrescoTrialLicense": {
@@ -1197,11 +1197,13 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "/g' /etc/chef/attributes.json\n",
-                                "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                "yum -y install coreutils glibc-common openssl\n",
+                                "ALFPASS=$(printf %s ",
                                 {
                                     "Ref": "AlfrescoPassword"
                                 },
-                                "/g' /etc/chef/attributes.json\n",
+                                " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
@@ -1477,11 +1479,13 @@
                                             "Ref": "AWS::Region"
                                         },
                                         "/g' /etc/chef/attributes.json\n",
-                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/",
+                                        "yum -y install coreutils glibc-common openssl\n",
+                                        "ALFPASS=$(printf %s ",
                                         {
                                             "Ref": "AlfrescoPassword"
                                         },
-                                        "/g' /etc/chef/attributes.json\n",
+                                        " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                         "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
