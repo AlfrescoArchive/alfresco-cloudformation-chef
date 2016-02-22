@@ -13,6 +13,7 @@
       }
     },
     "alfresco" : {
+        "use_libreoffice_os_repo" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -24,6 +25,8 @@
         "restart_services" : ["tomcat-alfresco","tomcat-solr"],
         "ssl_enabled" : false,
         "properties" : {
+            "jodconverter.officeHome" : "/usr/lib64/libreoffice",
+            "alfresco.cluster.enabled" : false,
             "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
@@ -48,7 +51,15 @@
         }
     },
     "tomcat" : {
-        "cleaner.minutes.interval" : 1
+        "cleaner.minutes.interval" : 1,
+        "jvm_route" : "@@JVM_ROUTE@@"
+    },
+    "commons" : {
+      "ec2_tags" : {
+        "haproxy_backends" : "solr",
+        "jvm_route" : "@@JVM_ROUTE@@",
+        "status" : "complete"
+      }
     },
     "artifacts" : {
         "alfresco-s3-connector" : {
