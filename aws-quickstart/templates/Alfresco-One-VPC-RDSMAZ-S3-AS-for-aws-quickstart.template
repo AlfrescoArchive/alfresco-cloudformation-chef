@@ -1203,7 +1203,7 @@
                                     "Ref": "AlfrescoPassword"
                                 },
                                 " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
-                                "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
+                                "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                 "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
                                 "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/install-alfresco.sh --no-sessionid | bash -s\n",
@@ -1485,7 +1485,7 @@
                                             "Ref": "AlfrescoPassword"
                                         },
                                         " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
-                                        "sed -i 's/@@ALFRESCO_PASSWORD@@/$ALFPASS/g' /etc/chef/attributes.json\n",
+                                        "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
                                         "export CHEF_ALFRESCO_VERSION='0.6.15'\n",
                                         "curl -L https://s3.amazonaws.com/quickstart-reference/alfresco-one/latest/scripts/install-alfresco.sh --no-sessionid | bash -s\n",
