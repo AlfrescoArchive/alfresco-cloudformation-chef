@@ -18,7 +18,7 @@
         "public_hostname" : "@@FQDN@@",
         "log.json.enabled" : false,
         "install_fonts" : false,
-        "version" : "5.0.2",
+        "version" : "5.0.2.5",
         "edition" : "enterprise",
         "components" : ["tomcat","repo","transform","solr"],
         "restart_services" : ["tomcat-alfresco","tomcat-solr"],
@@ -55,5 +55,5 @@
             "enabled" : true
         }
     },
-    "run_list": ["alfresco::default"]
+    "run_list": ["commons::ec2-tagging","alfresco::default"]
 }
