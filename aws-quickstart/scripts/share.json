@@ -16,6 +16,7 @@
       "use_nossl_config" : true
     },
     "alfresco" : {
+        "use_libreoffice_os_repo" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -23,7 +24,7 @@
         "public_portssl" : "80",
         "log.json.enabled" : false,
         "install_fonts" : false,
-        "version" : "5.0.2",
+        "version" : "5.0.2.5",
         "edition" : "enterprise",
         "components" : ["haproxy","nginx","tomcat","transform","repo","share","aos","googledocs"],
         "restart_services" : ["tomcat-alfresco","tomcat-share"],
@@ -33,6 +34,7 @@
         },
         "properties" : {
             "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
+            "jodconverter.officeHome" : "/usr/lib64/libreoffice",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
@@ -58,12 +60,24 @@
         }
     },
     "tomcat" : {
-        "cleaner.minutes.interval" : 1
+        "cleaner.minutes.interval" : 1,
+        "jvm_route" : "@@JVM_ROUTE@@"
     },
     "haproxy" : {
-      "ec2" : {
-        "stack_name" : "@@STACK_NAME@@",
-        "install_haproxy_discovery" : true
+        "ec2" : {
+            "install_haproxy_discovery" : true
+        }
+    },
+    "commons" : {
+      "ec2_tags" : {
+        "haproxy_backends" : "alfresco,share",
+        "jvm_route" : "@@JVM_ROUTE@@"
+      },
+      "ec2_discovery" : {
+        "query_tags" : {
+          "aws:cloudformation:stack-name" : "@@STACK_NAME@@",
+          "status" : "complete"
+        }
       }
     },
     "artifacts" : {
@@ -71,5 +85,5 @@
             "enabled" : true
         }
     },
-    "run_list": ["alfresco::default"]
+    "run_list": ["commons::ec2-tagging","alfresco::default", "alfresco::redeploy"]
 }
