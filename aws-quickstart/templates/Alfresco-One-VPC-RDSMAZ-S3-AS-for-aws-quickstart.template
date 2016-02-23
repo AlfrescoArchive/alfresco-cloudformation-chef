@@ -23,7 +23,7 @@
         },
         "AZ1": {
             "Type": "AWS::EC2::AvailabilityZone::Name",
-            "Description": "First availabiltiy zone to deploy into. Note: eu-central-1 is not supported yet.",
+            "Description": "First availabiltiy zone to deploy into.",
             "ConstraintDescription": "Must be a valid EC2 Availabilty zone"
         },
         "AZ2": {
