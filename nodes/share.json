@@ -82,7 +82,8 @@
     },
     "artifacts" : {
         "alfresco-s3-connector" : {
-            "enabled" : true
+            "enabled" : true,
+            "version" : "1.3.0.3"
         }
     },
     "run_list": ["commons::ec2-tagging","alfresco::default", "alfresco::redeploy"]
