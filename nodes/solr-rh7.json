@@ -24,7 +24,7 @@
         "public_hostname" : "@@FQDN@@",
         "log.json.enabled" : false,
         "install_fonts" : false,
-        "version" : "5.0.2",
+        "version" : "5.0.2.5",
         "edition" : "enterprise",
         "components" : ["tomcat","repo","transform","solr","rm"],
         "restart_services" : ["tomcat-alfresco","tomcat-solr"],
