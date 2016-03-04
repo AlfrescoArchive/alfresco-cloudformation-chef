@@ -178,34 +178,34 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-61bbf104"
+                "AMI": "ami-01744c6b"
             },
             "us-west-1": {
-                "AMI": "ami-f77fbeb3"
+                "AMI": "ami-75304315"
             },
             "us-west-2": {
-                "AMI": "ami-d440a6e7"
+                "AMI": "ami-c30ce0a3"
             },
             "eu-west-1": {
-                "AMI": "ami-33734044"
+                "AMI": "ami-120ab461"
             },
             "eu-central-1": {
-                "AMI": "ami-e68f82fb"
+                "AMI": "ami-e352b78c"
             },
             "ap-southeast-1": {
-                "AMI": "ami-2a7b6b78"
+                "AMI": "ami-29d41c4a"
             },
             "ap-southeast-2": {
-                "AMI": "ami-d38dc6e9"
+                "AMI": "ami-9d4f6efe"
             },
             "ap-northeast-1": {
-                "AMI": "ami-b80b6db8"
+                "AMI": "ami-08cdc166"
             },
             "ap-northeast-2": {
-                "AMI": "ami-dd9d53b3"
+                "AMI": "ami-16559b78"
             },
             "sa-east-1": {
-                "AMI": "ami-fd0197e0"
+                "AMI": "ami-e710928b"
             }
         },
         "AWSNATAMI": {
@@ -1205,7 +1205,7 @@
                                 " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
                                 "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "export CHEF_ALFRESCO_VERSION='0.6.22'\n",
+                                "export CHEF_ALFRESCO_VERSION='0.6.24'\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
@@ -1488,7 +1488,7 @@
                                         " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
                                         "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "export CHEF_ALFRESCO_VERSION='0.6.22'\n",
+                                        "export CHEF_ALFRESCO_VERSION='0.6.24'\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",

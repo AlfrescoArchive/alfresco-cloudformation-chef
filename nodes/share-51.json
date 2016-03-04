@@ -23,10 +23,6 @@
         "public_protocol" : "http",
         "public_portssl" : "80",
         "log.json.enabled" : false,
-        "install_fonts" : false,
-        "version" : "5.1-EA-3",
-        "edition" : "enterprise",
-        "components" : ["haproxy","nginx","tomcat","transform","repo","share","aos","googledocs"],
         "restart_services" : ["tomcat-alfresco","tomcat-share"],
         "ssl_enabled" : false,
         "shareproperties" : {
@@ -86,5 +82,5 @@
             "version" : "1.3.0.3"
         }
     },
-    "run_list": ["commons::ec2-tagging","alfresco::default", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::redeploy"]
 }
