@@ -79,7 +79,8 @@
     "artifacts" : {
         "alfresco-s3-connector" : {
             "enabled" : true,
-            "version" : "1.3.0.3"
+            "path" : "/root/alfresco-s3-connector.amp",
+            "destination" : "/usr/share/tomcat/amps"
         }
     },
     "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::redeploy"]
