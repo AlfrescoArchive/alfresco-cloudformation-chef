@@ -1,19 +1,8 @@
 {
     "name": "solr",
-    "artifact-deployer" : {
-      "maven" : {
-        "timeout" : 1500,
-        "repositories" : {
-          "private" : {
-            "url" : "https://artifacts.alfresco.com/nexus/content/groups/private",
-            "username" : "@@ARTIFACT_REPO_USERNAME@@",
-            "password" : "@@ARTIFACT_REPO_PASSWORD@@"
-          }
-        }
-      }
-    },
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
+        "db_ssl_enabled" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -59,7 +48,8 @@
     "artifacts" : {
         "alfresco-s3-connector" : {
             "enabled" : true,
-            "version" : "1.3.0.3"
+            "path" : "/tmp/alfresco-s3-connector.amp",
+            "destination" : "/usr/share/tomcat/amps"
         }
     },
     "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::redeploy"]

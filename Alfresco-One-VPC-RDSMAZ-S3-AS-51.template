@@ -178,7 +178,7 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-01744c6b"
+                "AMI": "ami-d3606bb9"
             },
             "us-west-1": {
                 "AMI": "ami-75304315"
@@ -1205,7 +1205,7 @@
                                 " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
                                 "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                 "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                "export CHEF_ALFRESCO_VERSION='0.6.24'\n",
+                                "export CHEF_ALFRESCO_VERSION='0.6.25'\n",
                                 "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
@@ -1484,7 +1484,7 @@
                                         " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
                                         "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/attributes.json\n",
                                         "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/attributes.json\n",
-                                        "export CHEF_ALFRESCO_VERSION='0.6.24'\n",
+                                        "export CHEF_ALFRESCO_VERSION='0.6.25'\n",
                                         "curl -L https://raw.githubusercontent.com/Alfresco/alfresco-cloudformation-chef/master/nodes/install-alfresco.sh --no-sessionid | bash -s\n",
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",

@@ -1,22 +1,11 @@
 {
     "name": "share",
-    "artifact-deployer" : {
-      "maven" : {
-        "timeout" : 1500,
-        "repositories" : {
-          "private" : {
-            "url" : "https://artifacts.alfresco.com/nexus/content/groups/private",
-            "username" : "@@ARTIFACT_REPO_USERNAME@@",
-            "password" : "@@ARTIFACT_REPO_PASSWORD@@"
-          }
-        }
-      }
-    },
     "nginx" : {
       "use_nossl_config" : true
     },
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
+        "db_ssl_enabled" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -79,7 +68,7 @@
     "artifacts" : {
         "alfresco-s3-connector" : {
             "enabled" : true,
-            "path" : "/root/alfresco-s3-connector.amp",
+            "path" : "/tmp/alfresco-s3-connector.amp",
             "destination" : "/usr/share/tomcat/amps"
         }
     },
