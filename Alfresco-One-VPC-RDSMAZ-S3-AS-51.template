@@ -162,17 +162,6 @@
             "Type": "String",
             "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have one, please ask for it to your Sales representative or to Alfresco Support via http://support.alfresco.com",
             "Default": "type a public URL here, i.e. a S3 url with your license"
-        },
-        "ArtifactRepoUsername": {
-            "Type": "String",
-            "Default": "maven-enterprise-trial",
-            "Description": "Username for the Alfresco artifact repository. Leave this value by default."
-        },
-        "ArtifactRepoPassword": {
-            "Type": "String",
-            "Description": "Password for the Alfresco artifact repository user. Leave this value by default.",
-            "Default": "trialuser",
-            "NoEcho": "TRUE"
         }
     },
     "Mappings": {
