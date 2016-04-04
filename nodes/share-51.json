@@ -68,7 +68,7 @@
     "artifacts" : {
         "alfresco-s3-connector" : {
             "enabled" : true,
-            "path" : "/tmp/alfresco-s3-connector.amp",
+            "path" : "/root/alfresco-s3-connector.amp",
             "destination" : "/usr/share/tomcat/amps"
         }
     },
