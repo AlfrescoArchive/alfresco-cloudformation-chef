@@ -9,16 +9,15 @@
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
+        "log.json.enabled" : false,
         "public_protocol" : "http",
         "public_portssl" : "80",
-        "log.json.enabled" : false,
-        "restart_services" : ["tomcat-alfresco","tomcat-share"],
+        "components" : ["repo","share"],
         "ssl_enabled" : false,
         "shareproperties" : {
           "hz_aws_enabled" : true
         },
         "properties" : {
-            "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
             "jodconverter.officeHome" : "/usr/lib64/libreoffice",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
@@ -55,7 +54,7 @@
     },
     "commons" : {
       "ec2_tags" : {
-        "haproxy_backends" : "alfresco,share",
+        "haproxy_backends" : "share",
         "jvm_route" : "@@JVM_ROUTE@@"
       },
       "ec2_discovery" : {
@@ -71,7 +70,8 @@
             "path" : "/root/alfresco-s3-connector.amp",
             "destination" : "/usr/share/tomcat/amps",
             "user" : "tomcat",
-            "group" : "tomcat"
+            "group" : "tomcat",
+            "type" : "amp"
         }
     },
     "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::redeploy"]

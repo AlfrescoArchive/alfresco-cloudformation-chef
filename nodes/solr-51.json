@@ -7,11 +7,10 @@
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
         "log.json.enabled" : false,
-        "restart_services" : ["tomcat-alfresco","tomcat-solr"],
+        "components" : ["repo","solr"],
         "ssl_enabled" : false,
         "properties" : {
             "alfresco.cluster.enabled" : false,
-            "dir.license.external" : "/usr/share/tomcat-alfresco/alflicense",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",
@@ -51,7 +50,8 @@
             "path" : "/root/alfresco-s3-connector.amp",
             "destination" : "/usr/share/tomcat/amps",
             "user" : "tomcat",
-            "group" : "tomcat"
+            "group" : "tomcat",
+            "type" : "amp"
         }
     },
     "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::redeploy"]
