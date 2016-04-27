@@ -167,7 +167,7 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-0bf1fb61"
+                "AMI": "ami-b525c0d8"
             },
             "us-west-1": {
                 "AMI": "ami-75304315"
@@ -1198,7 +1198,7 @@
                                 "yum remove -y mysql-server\n",
                                 "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                 "rm -fr /etc/tomcat-solr /var/lib/tomcat-solr /usr/share/tomcat-solr /var/log/tomcat-solr /var/cache/tomcat-solr /usr/share/tomcat/alf_data/solrhome /usr/share/tomcat/alf_data/solrContentStore /usr/share/tomcat/alf_data/solr4Backup /usr/share/tomcat/alf_data/newAlfrescoModels /etc/sysconfig/tomcat-solr /etc/cron.d/solr-cleaner.cron /usr/lib/systemd/system/tomcat-solr.service\n",
-                                "#cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
+                                "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
                                 "#export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "#export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                 "#export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
@@ -1469,7 +1469,7 @@
                                         "rm -fr /etc/tomcat-share /var/lib/tomcat-share /usr/share/tomcat-share /var/log/tomcat-share /var/cache/tomcat-share /etc/sysconfig/tomcat-share /usr/lib/systemd/system/tomcat-share.service\n",
                                         "mysql -u ", { "Ref": "RDSUsername" }, " -p", { "Ref": "RDSPassword" }, " -h ", { "Fn::GetAtt": [ "RDSDBInstance", "Endpoint.Address" ] }," -e \"desc ", { "Ref": "RDSDBName" }, ".alf_server\" > /dev/null 2>&1\n",
                                         "if [ $? == 1 ]; then sleep 60; fi\n",
-                                        "#cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
+                                        "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
                                         "#export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "#export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                         "#export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
