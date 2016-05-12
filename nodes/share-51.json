@@ -68,6 +68,9 @@
         "ssl-db-creds" :{
             "enabled": true
         },
+        "keystore" : {
+          "enabled" : true  
+        },
         "alfresco-s3-connector" : {
             "enabled" : true,
             "path" : "/root/alfresco-s3-connector.amp",
