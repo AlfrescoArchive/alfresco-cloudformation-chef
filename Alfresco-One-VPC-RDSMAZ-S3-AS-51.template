@@ -167,7 +167,7 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-b525c0d8"
+                "AMI": "ami-25f61848"
             },
             "us-west-1": {
                 "AMI": "ami-75304315"
