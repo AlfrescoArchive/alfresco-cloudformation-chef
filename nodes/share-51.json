@@ -5,7 +5,7 @@
     },
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
-        "db_ssl_enabled" : true,
+        "db_ssl_enabled" : false,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
