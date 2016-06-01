@@ -18,7 +18,7 @@
           "hz_aws_enabled" : true
         },
         "properties" : {
-            "jodconverter.officeHome" : "/usr/lib64/libreoffice",
+            "jodconverter.officeHome" : "/opt/libreoffice4.2",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
