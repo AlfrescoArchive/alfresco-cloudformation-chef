@@ -53,7 +53,8 @@
     },
     "haproxy" : {
         "ec2" : {
-            "install_haproxy_discovery" : true
+            "install_haproxy_discovery" : true,
+            "discovery_enabled" : true
         }
     },
     "commons" : {

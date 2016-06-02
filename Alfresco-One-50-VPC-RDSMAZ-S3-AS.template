@@ -178,34 +178,34 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-61bbf104"
+                "AMI": "ami-6d1c2007"
             },
             "us-west-1": {
-                "AMI": "ami-f77fbeb3"
+                "AMI": "ami-af4333cf"
             },
             "us-west-2": {
-                "AMI": "ami-d440a6e7"
+                "AMI": "ami-d2c924b2"
             },
             "eu-west-1": {
-                "AMI": "ami-33734044"
+                "AMI": "ami-7abd0209"
             },
             "eu-central-1": {
-                "AMI": "ami-e68f82fb"
+                "AMI": "ami-9bf712f4"
             },
             "ap-southeast-1": {
-                "AMI": "ami-2a7b6b78"
+                "AMI": "ami-f068a193"
             },
             "ap-southeast-2": {
-                "AMI": "ami-d38dc6e9"
+                "AMI": "ami-fedafc9d"
             },
             "ap-northeast-1": {
-                "AMI": "ami-b80b6db8"
+                "AMI": "ami-eec1c380"
             },
             "ap-northeast-2": {
-                "AMI": "ami-dd9d53b3"
+                "AMI": "ami-c74789a9"
             },
             "sa-east-1": {
-                "AMI": "ami-fd0197e0"
+                "AMI": "ami-26b93b4a"
             }
         },
         "AWSNATAMI": {
