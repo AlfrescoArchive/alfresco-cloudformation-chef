@@ -3,6 +3,9 @@
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
         "db_ssl_enabled" : true,
+        "truststore_file" : "/usr/share/tomcat/alf_data/keystore/alfresco/keystore/ssl.truststore",
+        "truststore_type" : "JCEKS",
+        "truststore_password" : "kT9X6oe68t",
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -10,6 +13,7 @@
         "components" : ["repo","solr"],
         "ssl_enabled" : false,
         "properties" : {
+            "dir.root" : "/usr/share/tomcat/alf_data",
             "alfresco.cluster.enabled" : false,
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
