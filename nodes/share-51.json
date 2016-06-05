@@ -17,16 +17,21 @@
         "public_portssl" : "80",
         "components" : ["repo","share"],
         "ssl_enabled" : false,
+        "shared" : "/usr/share/tomcat/shared",
         "shareproperties" : {
-          "hz_aws_enabled" : true
+          "hz_aws_enabled" : true,
+          "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
+          "hz_aws_secret_key" : "@@AWS_SECRET_KEY@@",
+          "hz_aws_sg_name" : "@@AWS_SG_NAME@@",
+          "hz_aws_tag_key" : "haproxy-role",
+          "hz_aws_tag_value" : "share",
+          "hz_aws_region" : "@@AWS_REGION@@"
         },
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
             "jodconverter.officeHome" : "/opt/libreoffice4.2",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
-            "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
-            "hz_aws_secret_key" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",
             "db.dbname" : "@@DB_NAME@@",
             "db.username" : "@@DB_USERNAME@@",
@@ -34,10 +39,6 @@
             "db.prefix" : "mysql",
             "s3.bucketName" : "@@CONTENTSTORE_S3_BUCKET@@",
             "s3.bucketLocation" : "@@AWS_REGION@@",
-            "hz_aws_enabled" : true,
-            "hz_aws_sg_name" : "@@AWS_SG_NAME@@",
-            "hz_aws_tag_key" : "haproxy-role",
-            "hz_aws_tag_value" : "share",
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@"
         },
         "repo_tomcat_instance" : {
