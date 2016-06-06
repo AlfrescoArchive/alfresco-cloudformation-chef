@@ -1101,7 +1101,7 @@
                                 "#!/bin/bash -x\n",
                                 "/usr/bin/yum check-update\n",
                                 "/usr/bin/yum install -y libffi-devel openssl-devel python-pip\n",
-                                "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1\n",
+                                "/usr/bin/pip install pyopenssl ndg-httpsclient pyasn1 awscli\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
