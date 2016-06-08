@@ -35,6 +35,9 @@
         },
         "workspace-solrproperties" : {
             "alfresco.corePoolSize" : 4
+        },
+        "solrproperties" : {
+            "alfresco.port" : "8070"
         }
     },
     "tomcat" : {
