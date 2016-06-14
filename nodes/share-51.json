@@ -18,6 +18,7 @@
         "components" : ["repo","share"],
         "ssl_enabled" : false,
         "shared" : "/usr/share/tomcat/shared",
+        "generate.share.config.custom" : true,
         "shareproperties" : {
           "hz_aws_enabled" : true,
           "hz_aws_access_key" : "@@AWS_ACCESS_KEY@@",
@@ -42,10 +43,10 @@
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@"
         },
         "repo_tomcat_instance" : {
-            "xmx_ratio" : 0.5
+            "xmx_ratio" : 0.50
         },
         "share_tomcat_instance" : {
-            "xmx_ratio" : 0.5
+            "xmx_ratio" : 0.20
         }
     },
     "tomcat" : {
@@ -83,5 +84,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::share", "alfresco::haproxy-config", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::redeploy"]
 }
