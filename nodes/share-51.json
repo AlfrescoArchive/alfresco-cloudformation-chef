@@ -46,7 +46,7 @@
             "xmx_ratio" : 0.50
         },
         "share_tomcat_instance" : {
-            "xmx_ratio" : 0.20
+            "xmx_ratio" : 0.30
         }
     },
     "tomcat" : {
@@ -84,5 +84,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging","artifact-deployer::default","alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "artifact-deployer::default", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::redeploy"]
 }
