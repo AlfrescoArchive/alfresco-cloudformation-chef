@@ -1494,6 +1494,11 @@
                                             "Ref": "AWS::Region"
                                         },
                                         " >> /root/.aws/config\n",
+                                        "systemctl disable haproxy\n",
+                                        "systemctl stop haproxy\n",
+                                        "yum remove -y haproxy\n",
+                                        "rm -fr /etc/haproxy/haproxy.cfg\n",
+                                        "rm -fr /var/log/haproxy\n",
                                         "systemctl stop mysql-default\n",
                                         "systemctl disable mysql-default\n",
                                         "systemctl stop tomcat-solr\n",
