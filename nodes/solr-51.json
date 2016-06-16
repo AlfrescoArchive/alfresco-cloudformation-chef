@@ -50,6 +50,9 @@
       }
     },
     "artifacts" : {
+         "ssl-db-creds" :{
+            "enabled": true
+        },
         "alfresco-s3-connector" : {
             "enabled" : true,
             "path" : "/root/alfresco-s3-connector.amp",
