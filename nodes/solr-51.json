@@ -12,6 +12,7 @@
         "log.json.enabled" : false,
         "components" : ["repo","solr"],
         "ssl_enabled" : false,
+        "generate.solr.core.config" : true,
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
             "alfresco.cluster.enabled" : false,
@@ -35,7 +36,11 @@
             "xmx_ratio" : 0.50
         },
         "workspace-solrproperties" : {
-            "alfresco.corePoolSize" : 4
+            "alfresco.corePoolSize" : 4,
+            "alfresco.port" : "8070"
+        },
+        "archive-solrproperties" : {
+            "alfresco.port" : "8070"
         }
     },
     "tomcat" : {
@@ -62,5 +67,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::solr" ,"alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
 }
