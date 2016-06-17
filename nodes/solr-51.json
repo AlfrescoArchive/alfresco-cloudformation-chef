@@ -67,5 +67,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::solr" ,"alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "alfresco::solr", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
 }
