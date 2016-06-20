@@ -1223,6 +1223,8 @@
                                     "Ref": "AWS::Region"
                                 },
                                 " >> /root/.aws/config\n",
+                                "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
+                                "aws ec2 describe-availability-zones\n",
                                 "systemctl stop mysql-default\n",
                                 "systemctl disable mysql-default\n",
                                 "systemctl stop tomcat-solr\n",
@@ -1233,6 +1235,7 @@
                                 "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
                                 "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
+                                "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                 "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
                                 "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"AlfrescoNodesMinSize" }, " --max-size ", { "Ref":"AlfrescoNodesMaxSize" }, " --desired-capacity ", { "Ref":"AlfrescoNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                             ]
@@ -1494,6 +1497,8 @@
                                             "Ref": "AWS::Region"
                                         },
                                         " >> /root/.aws/config\n",
+                                        "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
+                                        "aws ec2 describe-availability-zones\n",
                                         "systemctl disable haproxy\n",
                                         "systemctl stop haproxy\n",
                                         "yum remove -y haproxy\n",
@@ -1511,6 +1516,7 @@
                                         "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
                                         "export ALFSUBNET1=", { "Ref":"AlfrescoSubnet1" }, "\n",
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
+                                        "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                         "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
                                         "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"IndexNodesMinSize" }, " --max-size ", { "Ref":"IndexNodesMaxSize" }, " --desired-capacity ", { "Ref":"IndexNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
                                     ]
