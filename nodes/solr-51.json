@@ -26,7 +26,6 @@
             "s3.bucketName" : "@@CONTENTSTORE_S3_BUCKET@@",
             "s3.bucketLocation" : "@@AWS_REGION@@",
             "solr.port" : "8090",
-            "alfresco.port": "8070",
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@"
         },
         "repo_tomcat_instance" : {
