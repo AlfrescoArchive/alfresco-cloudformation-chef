@@ -12,6 +12,7 @@
         "log.json.enabled" : false,
         "components" : ["repo","solr"],
         "ssl_enabled" : false,
+        "generate.solr.core.config" : true,
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
             "alfresco.cluster.enabled" : false,
@@ -25,7 +26,6 @@
             "s3.bucketName" : "@@CONTENTSTORE_S3_BUCKET@@",
             "s3.bucketLocation" : "@@AWS_REGION@@",
             "solr.port" : "8090",
-            "alfresco.port": "8070",
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@"
         },
         "repo_tomcat_instance" : {
@@ -35,7 +35,11 @@
             "xmx_ratio" : 0.50
         },
         "workspace-solrproperties" : {
-            "alfresco.corePoolSize" : 4
+            "alfresco.corePoolSize" : 4,
+            "alfresco.port" : "8070"
+        },
+        "archive-solrproperties" : {
+            "alfresco.port" : "8070"
         }
     },
     "tomcat" : {
@@ -50,6 +54,9 @@
       }
     },
     "artifacts" : {
+         "ssl-db-creds" :{
+            "enabled": true
+        },
         "alfresco-s3-connector" : {
             "enabled" : true,
             "path" : "/root/alfresco-s3-connector.amp",
@@ -59,5 +66,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "artifact-deployer::default", "alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "alfresco::solr-config", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
 }
