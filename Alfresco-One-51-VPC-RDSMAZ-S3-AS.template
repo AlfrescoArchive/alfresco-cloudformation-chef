@@ -197,7 +197,7 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-8019e4ed"
+                "AMI": "ami-36a06d5b"
             },
             "us-west-1": {
                 "AMI": "ami-75304315"
@@ -1237,7 +1237,8 @@
                                 "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                 "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                 "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
-                                "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"AlfrescoNodesMinSize" }, " --max-size ", { "Ref":"AlfrescoNodesMaxSize" }, " --desired-capacity ", { "Ref":"AlfrescoNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
+                                "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"AlfrescoNodesMinSize" }, " --max-size ", { "Ref":"AlfrescoNodesMaxSize" }, " --desired-capacity ", { "Ref":"AlfrescoNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n",
+                                "systemctl restart tomcat-alfresco\n"
                             ]
                         ]
                     }
@@ -1518,7 +1519,8 @@
                                         "export ALFSUBNET2=", { "Ref":"AlfrescoSubnet2" }, "\n",
                                         "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                         "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
-                                        "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"IndexNodesMinSize" }, " --max-size ", { "Ref":"IndexNodesMaxSize" }, " --desired-capacity ", { "Ref":"IndexNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n"
+                                        "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"IndexNodesMinSize" }, " --max-size ", { "Ref":"IndexNodesMaxSize" }, " --desired-capacity ", { "Ref":"IndexNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n",
+                                        "systemctl restart tomcat-alfresco\n"
                                     ]
                                 ]
                             }
