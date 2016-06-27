@@ -1238,7 +1238,7 @@
                                 "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                 "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep AlfrescoAutoScalingGroup|awk -F\\\" '{ print $4 }')\n",
                                 "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"AlfrescoNodesMinSize" }, " --max-size ", { "Ref":"AlfrescoNodesMaxSize" }, " --desired-capacity ", { "Ref":"AlfrescoNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n",
-                                "sleep 240\n",
+                                "sleep 300\n",
                                 "export STARTED=$(grep org.alfresco.web.scripts.servlet.X509ServletFilterBase /var/log/tomcat-alfresco/alfresco.log|wc -l)\n",
                                 "if [ $STARTED -ge 1 ]; then systemctl restart tomcat-alfresco; else sleep 120; systemctl restart tomcat-alfresco; fi;\n"
                             ]
@@ -1522,7 +1522,7 @@
                                         "curl -s 169.254.169.254/latest/meta-data/iam/info\n",
                                         "export AUTOSCALING_GROUP_NAME=$(aws autoscaling describe-auto-scaling-groups | grep AutoScalingGroupName|grep IndexAutoScalingGroup|awk -F\\\" '{ print $4 }' )\n",
                                         "aws autoscaling update-auto-scaling-group --auto-scaling-group-name $AUTOSCALING_GROUP_NAME --min-size ", { "Ref":"IndexNodesMinSize" }, " --max-size ", { "Ref":"IndexNodesMaxSize" }, " --desired-capacity ", { "Ref":"IndexNodesDesiredCapacity" }, " --vpc-zone-identifier $ALFSUBNET1,$ALFSUBNET2\n",
-                                        "sleep 240\n",
+                                        "sleep 300\n",
                                         "export STARTED=$(grep org.alfresco.web.scripts.servlet.X509ServletFilterBase /var/log/tomcat-alfresco/alfresco.log|wc -l)\n",
                                         "if [ $STARTED -ge 1 ]; then systemctl restart tomcat-alfresco; else sleep 120; systemctl restart tomcat-alfresco; fi;\n"
                                     ]
