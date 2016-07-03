@@ -73,6 +73,9 @@
       }
     },
     "artifacts" : {
+        "keystore" : {
+          "enabled" : true
+        },
         "ssl-db-creds" :{
             "enabled": true
         },
