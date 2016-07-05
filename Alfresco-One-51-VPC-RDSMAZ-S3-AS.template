@@ -225,6 +225,9 @@
             },
             "sa-east-1": {
                 "AMI": "ami-e710928b"
+            },
+            "ap-south-1": {
+                "AMI": "ami-e710928b"
             }
         },
         "AWSNATAMI": {
@@ -254,6 +257,9 @@
             },
             "sa-east-1": {
                 "AMI": "ami-b972dba4"
+            },
+            "ap-south-1": {
+                "AMI": "ami-e710928b"
             }
         },
         "SubnetConfig": {
