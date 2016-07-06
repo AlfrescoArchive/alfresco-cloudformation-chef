@@ -197,7 +197,7 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-36a06d5b"
+                "AMI": "ami-7a0c896d"
             },
             "us-west-1": {
                 "AMI": "ami-75304315"
@@ -1326,9 +1326,9 @@
                "Properties":{
                   "AvailabilityZones": [ { "Ref":"AZ1", "Ref":"AZ2" } ],
                   "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet1", "Ref":"AlfrescoSubnet2" } ],
-                  "Cooldown":"600",
+                  "Cooldown":"900",
                   "DesiredCapacity":"1",
-                  "HealthCheckGracePeriod":"600",
+                  "HealthCheckGracePeriod":"900",
                   "HealthCheckType":"ELB",
                   "LaunchConfigurationName": { "Ref":"AlfrescoASLaunchConfig" },
                   "LoadBalancerNames":[ { "Ref":"ElasticLoadBalancer" } ],
@@ -1610,9 +1610,9 @@
                    "Properties":{
                       "AvailabilityZones": [ { "Ref":"AZ2", "Ref":"AZ1" } ],
                       "VPCZoneIdentifier": [ { "Ref":"AlfrescoSubnet2", "Ref":"AlfrescoSubnet1" } ],
-                      "Cooldown":"600",
+                      "Cooldown":"900",
                       "DesiredCapacity":"1",
-                      "HealthCheckGracePeriod":"600",
+                      "HealthCheckGracePeriod":"900",
                       "HealthCheckType":"EC2",
                       "LaunchConfigurationName":{
                          "Ref":"IndexASLaunchConfig"
