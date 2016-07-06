@@ -3,9 +3,6 @@
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
         "db_ssl_enabled" : true,
-        "truststore_file" : "/usr/share/tomcat/alf_data/keystore/alfresco/keystore/ssl.truststore",
-        "truststore_type" : "JCEKS",
-        "truststore_password" : "kT9X6oe68t",
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -54,6 +51,9 @@
       }
     },
     "artifacts" : {
+         "keystore" : {
+            "enabled" : true
+         },
          "ssl-db-creds" :{
             "enabled": true
         },

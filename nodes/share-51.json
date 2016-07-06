@@ -6,9 +6,6 @@
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
         "db_ssl_enabled" : true,
-        "truststore_file" : "/usr/share/tomcat/alf_data/keystore/alfresco/keystore/ssl.truststore",
-        "truststore_type" : "JCEKS",
-        "truststore_password" : "kT9X6oe68t",
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
@@ -41,7 +38,7 @@
             "s3.bucketName" : "@@CONTENTSTORE_S3_BUCKET@@",
             "s3.bucketLocation" : "@@AWS_REGION@@",
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@",
-            "alfresco.cluster.enabled" : true,
+            "alfresco.cluster.enabled" : true
         },
         "repo_tomcat_instance" : {
             "xmx_ratio" : 0.50
@@ -73,6 +70,9 @@
       }
     },
     "artifacts" : {
+        "keystore" : {
+          "enabled" : true
+        },
         "ssl-db-creds" :{
             "enabled": true
         },
@@ -85,5 +85,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "alfresco::redeploy"]
 }
