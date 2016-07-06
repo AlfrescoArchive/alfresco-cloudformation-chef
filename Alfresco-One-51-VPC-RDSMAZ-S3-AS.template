@@ -175,7 +175,7 @@
         },
         "AlfrescoNodesDesiredCapacity": {
             "Type": "String",
-            "Description": "Specifies the desired capacity for the Alfreco nodes Auto Scaling group",
+            "Description": "Specifies the desired capacity for the Alfresco nodes Auto Scaling group",
             "Default": "2"
         },
         "IndexNodesMinSize": {
