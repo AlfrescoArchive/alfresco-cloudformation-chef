@@ -44,6 +44,9 @@
         "jvm_route" : "@@JVM_ROUTE@@"
     },
     "commons" : {
+      "awscli" : {
+        "aws_region" : "@@AWS_REGION@@"
+      },
       "ec2_tags" : {
         "haproxy_backends" : "solr",
         "jvm_route" : "@@JVM_ROUTE@@",
