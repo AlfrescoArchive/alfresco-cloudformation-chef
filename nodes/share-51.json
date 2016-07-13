@@ -23,7 +23,8 @@
           "hz_aws_sg_name" : "@@AWS_SG_NAME@@",
           "hz_aws_tag_key" : "haproxy-role",
           "hz_aws_tag_value" : "share",
-          "hz_aws_region" : "@@AWS_REGION@@"
+          "hz_aws_region" : "@@AWS_REGION@@",
+          "alfresco.port" : "8070"
         },
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
