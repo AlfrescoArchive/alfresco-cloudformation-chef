@@ -197,69 +197,72 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-e9ec6cfe"
+                "AMI": "ami-714dd866"
             },
             "us-west-1": {
-                "AMI": "ami-8d7335ed"
+                "AMI": "ami-15115175"
             },
             "us-west-2": {
-                "AMI": "ami-8226e5e2"
+                "AMI": "ami-972de2f7"
             },
             "eu-west-1": {
-                "AMI": "ami-cd7117be"
+                "AMI": "ami-5d24482e"
             },
             "eu-central-1": {
-                "AMI": "ami-de51bbb1"
+                "AMI": "ami-4f679320"
             },
             "ap-southeast-1": {
-                "AMI": "ami-156bb676"
+                "AMI": "ami-e6e63985"
             },
             "ap-southeast-2": {
-                "AMI": "ami-6d63490e"
+                "AMI": "ami-4c3a0f2f"
             },
             "ap-northeast-1": {
-                "AMI": "ami-492dd128"
+                "AMI": "ami-09788268"
             },
             "ap-northeast-2": {
-                "AMI": "ami-2db17b43"
+                "AMI": "ami-ebf63c85"
             },
             "sa-east-1": {
-                "AMI": "ami-12b7237e"
+                "AMI": "ami-d09304bc"
             },
             "ap-south-1": {
-                "AMI": "ami-26fe9449"
+                "AMI": "ami-be3643d1"
             }
         },
         "AWSNATAMI": {
             "us-east-1": {
-                "AMI": "ami-4c9e4b24"
+                "AMI": "ami-4868ab25"
             },
             "us-west-1": {
-                "AMI": "ami-2b2b296e"
+                "AMI": "ami-004b0f60"
             },
             "us-west-2": {
-                "AMI": "ami-bb69128b"
+                "AMI": "ami-a275b1c2"
             },
             "eu-west-1": {
-                "AMI": "ami-3760b040"
+                "AMI": "ami-a8dd45db"
             },
             "eu-central-1": {
-                "AMI": "ami-204c7a3d"
+                "AMI": "ami-5825cd37"
             },
             "ap-southeast-1": {
-                "AMI": "ami-b082dae2"
+                "AMI": "ami-a79b49c4"
             },
             "ap-southeast-2": {
-                "AMI": "ami-996402a3"
+                "AMI": "ami-53371f30"
             },
             "ap-northeast-1": {
-                "AMI": "ami-55c29e54"
+                "AMI": "ami-2443b745"
+            },
+            "ap-northeast-2": {
+                "AMI": "ami-d14388bf"
             },
             "sa-east-1": {
-                "AMI": "ami-b972dba4"
+                "AMI": "ami-9336bcff"
             },
             "ap-south-1": {
-                "AMI": "ami-bf046ed0"
+                "AMI": "ami-e2b9d38d"
             }
         },
         "SubnetConfig": {
