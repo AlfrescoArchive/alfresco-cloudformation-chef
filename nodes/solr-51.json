@@ -1,5 +1,6 @@
 {
     "name": "solr",
+    "semaphore" : { "s3_bucket_name" : "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828" },
     "alfresco" : {
         "use_libreoffice_os_repo" : true,
         "db_ssl_enabled" : true,
@@ -69,5 +70,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "alfresco::solr-config", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "alfresco::solr-config", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }

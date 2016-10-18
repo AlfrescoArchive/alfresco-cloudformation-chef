@@ -1,5 +1,6 @@
 {
     "name": "share",
+    "semaphore" : { "s3_bucket_name" : "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828" },
     "nginx" : {
       "use_nossl_config" : true
     },
@@ -89,5 +90,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "alfresco::redeploy"]
+    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }
