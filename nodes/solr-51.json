@@ -70,5 +70,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "alfresco::solr-config", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
+    "run_list": ["commons::install_aws_sdk","commons::ec2-tagging", "alfresco::solr-config", "commons::artifact-deployer" ,"alfresco::repo", "alfresco::apply-amps", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }

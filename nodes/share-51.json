@@ -71,6 +71,9 @@
         "query_tags" : {
           "aws:cloudformation:stack-name" : "@@STACK_NAME@@",
           "status" : "complete"
+        },
+        "query_filters" : {
+          "instance-state-name" : "running"
         }
       }
     },
@@ -90,5 +93,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
+    "run_list": ["commons::install_aws_sdk","commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }
