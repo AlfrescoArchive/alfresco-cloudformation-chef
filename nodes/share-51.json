@@ -39,6 +39,8 @@
             "db.prefix" : "mysql",
             "s3.bucketName" : "@@CONTENTSTORE_S3_BUCKET@@",
             "s3.bucketLocation" : "@@AWS_REGION@@",
+            "s3service.https-only" : true,
+            "s3service.s3-endpoint-https-port" : "443",
             "alfresco_user_store.adminpassword" : "@@ALFRESCO_PASSWORD@@",
             "alfresco.cluster.enabled" : true
         },
