@@ -29,7 +29,7 @@
         },
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
-            "jodconverter.officeHome" : "/opt/libreoffice4.2",
+            "jodconverter.officeHome" : "/opt/libreoffice4.4",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",

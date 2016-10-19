@@ -13,6 +13,7 @@
         "generate.solr.core.config" : true,
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
+            "jodconverter.officeHome" : "/opt/libreoffice4.4",
             "alfresco.cluster.enabled" : false,
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
