@@ -100,5 +100,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["chef-client::config","commons::install_aws_sdk","commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
+    "run_list": ["commons::install_aws_sdk","commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }
