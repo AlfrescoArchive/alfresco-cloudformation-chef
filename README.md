@@ -93,13 +93,28 @@ Troubleshooting:
 ----------------
 ### SSH access
 * First, jump to one of your NAT servers (note: ec2-user):
-```ssh -i your-priv-key.pem ec2-user@NAT-PUBLIC-IP```
+
+```bash
+ssh -i your-priv-key.pem ec2-user@NAT-PUBLIC-IP
+```
+
 * Copy your private SSH key to that NAT from your workstation:
-```scp -i your-priv-key.pem your-priv-key.pem ec2-user@NAT-PUBLIC-IP:/home/ec2-user```
+
+```
+scp -i your-priv-key.pem your-priv-key.pem ec2-user@NAT-PUBLIC-IP:/home/ec2-user
+```
+
 * In the NAT server, set the appropriate permissions to the private key file:
-```chmod 400 your-priv-key.pem```
+
+```
+chmod 400 your-priv-key.pem
+```
+
 * From the NAT server, connect to any Alfresco or Index server (note: centos user!):
-```ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP```
+
+```
+ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP
+```
 
 ### Logs and Configuration Files Location
 * Logs for Alfresco and Share on the Alfresco Instances
