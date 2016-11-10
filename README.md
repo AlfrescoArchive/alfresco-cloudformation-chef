@@ -7,7 +7,7 @@ Alfresco CloudFormation Template with Chef
 * Extensive documentation about how to use this template will be available soon at http://aws.amazon.com/quiskstart/community
 * GovCloud and China regions are not supported in this release.
 
-*Demo:* Watch a 6' minutes demo here <LINK SOON>
+*Demo:* Watch a 6' minutes demo here https://youtu.be/zEmoI9WwIXo
 
 Overview
 --------------------
