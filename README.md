@@ -76,6 +76,73 @@ Considerations for Production Environments
 * Solr 4 in Alfresco 5.1 has not applied any specific tuning, i.e.: rerank or sharding
 * CloudFront WAF is not included
 
+Best Practices Applied
+----------------------
+* AWS Networking Security
+	* VPC, Bastion hosts, Public and Private Subnets
+* RDS SSL
+* EC2 Instance Profile
+* S3 SSL
+* S3 Server Side Encryption AES-256
+* Alfresco DB connection tuning
+* Memory tuning in Tomcat
+* Tomcat separation per Application (Alfresco repo, Alfresco Share and Solr)
+* Haproxy + Nginx protect Tomcats
+
+Troubleshooting:
+----------------
+### SSH access
+* First, jump to one of your NAT servers (note: ec2-user):
+`ssh -i your-priv-key.pem ec2-user@NAT-PUBLIC-IP`
+* Copy your private SSH key to that NAT from your workstation:
+`scp -i your-priv-key.pem your-priv-key.pem ec2-user@NAT-PUBLIC-IP:/home/ec2-user`
+* In the NAT server, set the appropriate permissions to the private key file:
+`chmod 400 your-priv-key.pem`
+* From the NAT server, connect to any Alfresco or Index server (note: centos user!):
+`ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP`
+
+### Logs and Configuration Files Location
+* Logs for Alfresco and Share on the Alfresco Instances
+/var/log/tomcat-{share,alfresco}.
+* Logs for Alfresco (for index tracking) and Solr on the Alfresco Index instances
+/var/log/tomcat-{solr,alfresco}.
+* Alfresco configuration files (any instance):
+/usr/share/tomcat/shared/classes/alfresco-global.properties
+/usr/share/tomcat/shared/classes/alfresco/extension/
+* For Share
+/usr/share/tomcat/shared/classes/alfresco/web-extension/.
+* JAVA_OPTS configuration variable for Tomcats:
+/etc/sysconfig/tomcat-alfresco
+/etc/sysconfig/tomcat-share
+/etc/sysconfig/tomcat-solr
+* server.xml for each Tomcat:
+/etc/tomcat-alfresco/server.xml
+/etc/tomcat-share/server.xml
+/etc/tomcat-solr/server.xml
+* All Tomcats in the servers uses this common files:
+/etc/tomcat/catalina.policy
+/etc/tomcat/catalina.properties
+/etc/tomcat/context.xml
+/etc/tomcat/tomcat-users.xml
+/etc/tomcat/web.xml
+* Solr configuration and default location:
+/usr/share/tomcat/alf_data/
+/usr/share/tomcat/alf_data/solrhome/workspace-SpacesStore/conf/solrcore.properties
+/usr/share/tomcat/alf_data/solrhome/archive-SpacesStore/conf/solrcore.properties
+/usr/share/tomcat/alf_data/solrContentStore (gzipped content)
+/usr/share/tomcat/alf_data/solr4Backup/
+* Logging properties for each Tomcat:
+/usr/share/tomcat-alfresco/conf/logging.properties
+/usr/share/tomcat-share/conf/logging.properties
+/usr/share/tomcat-solr/conf/logging.properties
+* Alfresco nodes come with Nginx and HAProxy:
+/etc/nginx/nginx.conf
+/var/log/nginx/
+systemctl {start,stop,restart,status} nginx
+/etc/haproxy/haproxy.cfg
+/var/log/haproxy/
+systemctl {start,stop,restart,status} haproxy
+
 
 License
 -------
