@@ -94,7 +94,7 @@ Troubleshooting:
 ### SSH access
 * First, jump to one of your NAT servers (note: ec2-user):
 
-```bash
+```
 ssh -i your-priv-key.pem ec2-user@NAT-PUBLIC-IP
 ```
 
@@ -118,46 +118,65 @@ ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP
 
 ### Logs and Configuration Files Location
 * Logs for Alfresco and Share on the Alfresco Instances
-/var/log/tomcat-{share,alfresco}.
+```
+/var/log/tomcat-{share,alfresco}
+```
 * Logs for Alfresco (for index tracking) and Solr on the Alfresco Index instances
-/var/log/tomcat-{solr,alfresco}.
+```
+/var/log/tomcat-{solr,alfresco}
+```
 * Alfresco configuration files (any instance):
+```
 /usr/share/tomcat/shared/classes/alfresco-global.properties
 /usr/share/tomcat/shared/classes/alfresco/extension/
+```
 * For Share
-/usr/share/tomcat/shared/classes/alfresco/web-extension/.
+```
+/usr/share/tomcat/shared/classes/alfresco/web-extension/
+```
 * JAVA_OPTS configuration variable for Tomcats:
+```
 /etc/sysconfig/tomcat-alfresco
 /etc/sysconfig/tomcat-share
 /etc/sysconfig/tomcat-solr
+```
 * server.xml for each Tomcat:
+```
 /etc/tomcat-alfresco/server.xml
 /etc/tomcat-share/server.xml
 /etc/tomcat-solr/server.xml
+```
 * All Tomcats in the servers uses this common files:
+```
 /etc/tomcat/catalina.policy
 /etc/tomcat/catalina.properties
 /etc/tomcat/context.xml
 /etc/tomcat/tomcat-users.xml
 /etc/tomcat/web.xml
+```
 * Solr configuration and default location:
+```
 /usr/share/tomcat/alf_data/
 /usr/share/tomcat/alf_data/solrhome/workspace-SpacesStore/conf/solrcore.properties
 /usr/share/tomcat/alf_data/solrhome/archive-SpacesStore/conf/solrcore.properties
 /usr/share/tomcat/alf_data/solrContentStore (gzipped content)
 /usr/share/tomcat/alf_data/solr4Backup/
+```
 * Logging properties for each Tomcat:
+```
 /usr/share/tomcat-alfresco/conf/logging.properties
 /usr/share/tomcat-share/conf/logging.properties
 /usr/share/tomcat-solr/conf/logging.properties
+```
 * Alfresco nodes come with Nginx and HAProxy:
+```
 /etc/nginx/nginx.conf
 /var/log/nginx/
 systemctl {start,stop,restart,status} nginx
 /etc/haproxy/haproxy.cfg
 /var/log/haproxy/
 systemctl {start,stop,restart,status} haproxy
-
+```
 
 License
 -------
