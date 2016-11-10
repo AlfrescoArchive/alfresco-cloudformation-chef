@@ -1,6 +1,8 @@
 Alfresco CloudFormation Template with Chef
 ==========================================
 
+*Disclaimer:* This CloudFormation template should be considered for illustrative and reference purposes only. No warranty is expressed or implied. Improvements and any other contributions are encouraged and appreciated.
+
 *Notes:*
 * Extensive documentation about how to use this template will be available soon at http://aws.amazon.com/quiskstart/community
 * GovCloud and China regions are not supported in this release.
