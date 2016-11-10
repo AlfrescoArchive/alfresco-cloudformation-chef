@@ -1,6 +1,133 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
     "Description": "Alfresco One on AWS main template ** Version 2.0 ** This template will create a new VPC, and deploy an Alfresco cluster behind an ELB in 2 availabiltiy zones, the cluster will be configured to use an S3 bucket for storage and an multi-AZ MySQL RDS instance will be used as the database. **This version only supports all AWS regions except GovCloud**",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Alfresco Nodes"
+                    },
+                    "Parameters": [
+                        "AlfrescoInstanceType",
+                        "IndexInstanceType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Alfresco Storage"
+                    },
+                    "Parameters": [
+                        "RDSDBName",
+                        "RDSInstanceType",
+                        "RDSUsername",
+                        "RDSPassword",
+                        "S3BucketName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Alfresco Configuration"
+                    },
+                    "Parameters": [
+                        "AlfrescoPassword",
+                        "AlfrescoTrialLicense"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Scalability and Resilience"
+                    },
+                    "Parameters": [
+                        "AZ1",
+                        "AZ2",
+                        "AlfrescoNodesMinSize",
+                        "AlfrescoNodesMaxSize",
+                        "AlfrescoNodesDesiredCapacity",
+                        "IndexNodesMinSize",
+                        "IndexNodesMaxSize",
+                        "IndexNodesDesiredCapacity",
+                        "OperatorEMail"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Security"
+                    },
+                    "Parameters": [
+                        "KeyName",
+                        "SSHFrom",
+                        "NATInstanceType"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "AlfrescoInstanceType": {
+                    "default": "Alfresco Servers Instance Type"
+                },
+                "IndexInstanceType": {
+                    "default": "Index Servers Instance Type"
+                },
+                "RDSDBName": {
+                    "default": "RDS DB Name"
+                },
+                "RDSInstanceType": {
+                    "default": "RDS Instance Type"
+                },
+                "RDSUsername": {
+                    "default": "RDS User Name"
+                },
+                "RDSPassword": {
+                    "default": "RDS Password"
+                },
+                "S3BucketName": {
+                    "default": "S3 Bucket Name"
+                },
+                "AlfrescoPassword": {
+                    "default": "Alfresco Admin Password"
+                },
+                "AlfrescoTrialLicense": {
+                    "default": "Alfresco Trial License Location URL"
+                },
+                "AZ1": {
+                    "default": "Availability Zone 1"
+                },
+                "AZ2": {
+                    "default": "Availability Zone 2"
+                },
+                "AlfrescoNodesMinSize": {
+                    "default": "Alfresco Nodes Min Size"
+                },
+                "AlfrescoNodesMaxSize": {
+                    "default": "Alfresco Nodes Max Size"
+                },
+                "AlfrescoNodesDesiredCapacity": {
+                    "default": "Alfresco Nodes Desired Capacity"
+                },
+                "IndexNodesMinSize": {
+                    "default": "Index Nodes Min Size"
+                },
+                "IndexNodesMaxSize": {
+                    "default": "Index Nodes Max Size"
+                },
+                "IndexNodesDesiredCapacity": {
+                    "default": "Index Nodes Desired Capacity"
+                },
+                "OperatorEMail": {
+                    "default": "Operator EMail"
+                },
+                "KeyName": {
+                    "default": "SSH Key Name"
+                },
+                "SSHFrom": {
+                    "default": "SSH From"
+                },
+                "NATInstanceType": {
+                    "default": "NAT Instance Type"
+                }
+            }
+        }
+    },
     "Parameters": {
         "KeyName": {
             "Type": "AWS::EC2::KeyPair::KeyName",
@@ -36,7 +163,6 @@
             "Description": "Type of EC2 instance for the Alfresco instances (Share + Repository)",
             "Type": "String",
             "AllowedValues": [
-                "t2.medium",
                 "t2.large",
                 "m4.large",
                 "m4.xlarge",
@@ -67,29 +193,28 @@
             "Description": "Type of EC2 instance for the Alfresco Index instances (Solr)",
             "Type": "String",
             "AllowedValues": [
-                "t2.medium",
-                "t2.large",
-                "m4.large",
-                "m4.xlarge",
-                "m4.2xlarge",
-                "m4.4xlarge",
-                "m4.10xlarge",
-                "m3.medium",
-                "m3.large",
-                "m3.xlarge",
-                "m3.2xlarge",
-                "c4.large",
-                "c4.xlarge",
-                "c4.2xlarge",
-                "c4.4xlarge",
-                "c4.8xlarge",
-                "c3.large",
-                "c3.xlarge",
-                "c3.2xlarge",
-                "c3.4xlarge",
-                "c3.8xlarge",
-                "r3.large",
-                "r3.xlarge"
+              "t2.large",
+              "m4.large",
+              "m4.xlarge",
+              "m4.2xlarge",
+              "m4.4xlarge",
+              "m4.10xlarge",
+              "m3.medium",
+              "m3.large",
+              "m3.xlarge",
+              "m3.2xlarge",
+              "c4.large",
+              "c4.xlarge",
+              "c4.2xlarge",
+              "c4.4xlarge",
+              "c4.8xlarge",
+              "c3.large",
+              "c3.xlarge",
+              "c3.2xlarge",
+              "c3.4xlarge",
+              "c3.8xlarge",
+              "r3.large",
+              "r3.xlarge"
             ],
             "ConstraintDescription": "Must contain valid instance type"
         },
@@ -197,42 +322,48 @@
     "Mappings": {
         "ALINUXAMI": {
             "us-east-1": {
-                "AMI": "ami-714dd866"
+                "AMI": "ami-568bd141"
+            },
+            "us-east-2": {
+                "AMI": "ami-63257f06"
             },
             "us-west-1": {
-                "AMI": "ami-15115175"
+                "AMI": "ami-cf2268af"
             },
             "us-west-2": {
-                "AMI": "ami-972de2f7"
+                "AMI": "ami-7d34921d"
             },
             "eu-west-1": {
-                "AMI": "ami-5d24482e"
+                "AMI": "ami-8292d8f1"
             },
             "eu-central-1": {
-                "AMI": "ami-4f679320"
+                "AMI": "ami-3e936851"
             },
             "ap-southeast-1": {
-                "AMI": "ami-e6e63985"
+                "AMI": "ami-f41ebf97"
             },
             "ap-southeast-2": {
-                "AMI": "ami-4c3a0f2f"
+                "AMI": "ami-662f1305"
             },
             "ap-northeast-1": {
-                "AMI": "ami-09788268"
+                "AMI": "ami-dfc26fbe"
             },
             "ap-northeast-2": {
-                "AMI": "ami-ebf63c85"
+                "AMI": "ami-c526f2ab"
             },
             "sa-east-1": {
-                "AMI": "ami-d09304bc"
+                "AMI": "ami-5c51cd30"
             },
             "ap-south-1": {
-                "AMI": "ami-be3643d1"
+                "AMI": "ami-93a5d1fc"
             }
         },
         "AWSNATAMI": {
             "us-east-1": {
                 "AMI": "ami-4868ab25"
+            },
+            "us-east-2": {
+                "AMI": "ami-92a6fef7"
             },
             "us-west-1": {
                 "AMI": "ami-004b0f60"
@@ -943,7 +1074,26 @@
                                             ]
                                         ]
                                     }
-                                }
+                                },
+                                {
+              									"Effect": "Allow",
+              									"Action": [
+              										"s3:CreateBucket",
+              										"s3:DeleteBucket"
+              									],
+              									"Resource": {
+              										"Fn::Join": [
+              											"",
+              											[
+              												"arn:aws:s3:::",
+              												{
+              													"Ref": "S3Bucket"
+              												},
+                                      "-9282744662728828"
+              											]
+              										]
+              									}
+              								}
                             ]
                         }
                     }
@@ -1090,12 +1240,6 @@
         },
         "AlfrescoASLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
-            "Metadata": {
-                "AWS::CloudFormation::Init": {
-                    "config": {
-                }
-              }
-            },
             "Properties": {
                 "KeyName": {
                     "Ref": "KeyName"
@@ -1223,28 +1367,20 @@
                                 "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
                                 "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
                                 "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
-                                "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
+                                "echo \"$LOCALIP $LOCALSHORTNAME $LOCALNAME\" >> /etc/hosts\n",
                                 "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /usr/share/tomcat/shared/classes/alfresco/extension/license/license.lic\n",
                                 "systemctl stop mysql-default\n",
                                 "systemctl disable mysql-default\n",
                                 "systemctl stop tomcat-solr\n",
                                 "systemctl disable tomcat-solr\n",
                                 "yum remove -y mysql-server\n",
+                                "#echo 'timeout=120' >> /etc/yum.conf\n",
+                                "#yum clean all\n",
                                 "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                 "rm -fr /etc/tomcat-solr /var/lib/tomcat-solr /usr/share/tomcat-solr /var/log/tomcat-solr /var/cache/tomcat-solr /usr/share/tomcat/alf_data/solrhome /usr/share/tomcat/alf_data/solrContentStore /usr/share/tomcat/alf_data/solr4Backup /usr/share/tomcat/alf_data/newAlfrescoModels /etc/sysconfig/tomcat-solr /etc/cron.d/solr-cleaner.cron /usr/lib/systemd/system/tomcat-solr.service\n",
-                                "sleep $[($RANDOM%60)+1]\n",
-                                "IS_STARTING=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/starting|wc -l)\n",
-                                "IS_DONE=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/done|wc -l)\n",
-                                "if [[ $IS_STARTING -eq 0 ]]; then if [[ $IS_DONE -eq 0 ]]; then echo No starting flag or done flag FOUND! Creating starting flag...; echo $INSTANCEIDX > /tmp/starting; aws s3 cp /tmp/starting s3://",{ "Ref": "S3BucketName" },"/starting; echo This instace is FIRST; echo Now continue with chef-alfresco...; else echo Continue with chef-alfresco...; fi; else while STATE=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/done|wc -l); test $STATE = '0'; do sleep 30; echo -n '.'; done; fi\n",
-                                "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
-                                "if [[ -f /tmp/starting ]];",
-                                  "sleep 400;",
-                                  "then echo $INSTANCEIDX > /tmp/done;",
-                                  "aws s3 cp /tmp/done s3://",{ "Ref": "S3BucketName" },"/done;",
-                                  "aws s3 rm s3://",{ "Ref": "S3BucketName" },"/starting;",
-                                  "else sleep 400;",
-                                "fi\n",
-                                "systemctl restart tomcat-alfresco\n"
+                                "cd /etc/chef; chef-client -z -j chef-client.json\n",
+                                "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:", { "Ref": "AlfrescoPassword" }, " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
+                                "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:", { "Ref": "AlfrescoPassword" }, " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n"
                             ]
                         ]
                     }
@@ -1363,12 +1499,6 @@
             },
         "IndexASLaunchConfig": {
               "Type": "AWS::AutoScaling::LaunchConfiguration",
-              "Metadata": {
-                        "AWS::CloudFormation::Init": {
-                            "config": {
-                            }
-                        }
-                    },
               "Properties": {
                         "KeyName": {
                             "Ref": "KeyName"
@@ -1406,7 +1536,6 @@
                                         {
                                            "Ref":"AWS::StackName"
                                         },
-                                        " -r IndexASLaunchConfig",
                                         "    --access-key ",
                                         {
                                            "Ref":"CfnKeys"
@@ -1496,7 +1625,7 @@
                                         "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
                                         "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
                                         "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
-                                        "echo $LOCALIP $LOCALSHORTNAME $LOCALNAME >> /etc/hosts\n",
+                                        "echo \"$LOCALIP $LOCALSHORTNAME $LOCALNAME\" >> /etc/hosts\n",
                                         "curl -L ",{ "Ref": "AlfrescoTrialLicense" }," -o /usr/share/tomcat/shared/classes/alfresco/extension/license/license.lic\n",
                                         "systemctl disable haproxy\n",
                                         "systemctl stop haproxy\n",
@@ -1508,21 +1637,13 @@
                                         "systemctl stop tomcat-solr\n",
                                         "systemctl disable tomcat-solr\n",
                                         "yum remove -y mysql-server\n",
+                                        "#echo 'timeout=120' >> /etc/yum.conf\n",
+                                        "#yum clean all\n",
                                         "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                         "rm -fr /etc/tomcat-share /var/lib/tomcat-share /usr/share/tomcat-share /var/log/tomcat-share /var/cache/tomcat-share /etc/sysconfig/tomcat-share /usr/lib/systemd/system/tomcat-share.service\n",
-                                        "sleep $[($RANDOM%60)+1]\n",
-                                        "IS_STARTING=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/starting|wc -l)\n",
-                                        "IS_DONE=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/done|wc -l)\n",
-                                        "if [[ $IS_STARTING -eq 0 ]]; then if [[ $IS_DONE -eq 0 ]]; then echo No starting flag or done flag FOUND! Creating starting flag...; echo $INSTANCEIDX > /tmp/starting; aws s3 cp /tmp/starting s3://",{ "Ref": "S3BucketName" },"/starting; echo This instace is FIRST; echo Now continue with chef-alfresco...; else echo Continue with chef-alfresco...; fi; else while STATE=$(aws s3 ls s3://",{ "Ref": "S3BucketName" },"/done|wc -l); test $STATE = '0'; do sleep 30; echo -n '.'; done; fi\n",
-                                        "cd /etc/chef; chef-client -z -j /etc/chef/chef-client.json\n",
-                                        "if [[ -f /tmp/starting ]];",
-                                          "sleep 400;",
-                                          "then echo $INSTANCEIDX > /tmp/done;",
-                                          "aws s3 cp /tmp/done s3://",{ "Ref": "S3BucketName" },"/done;",
-                                          "aws s3 rm s3://",{ "Ref": "S3BucketName" },"/starting;",
-                                          "else sleep 400;",
-                                        "fi\n",
-                                        "systemctl restart tomcat-alfresco\n"
+                                        "cd /etc/chef; chef-client -z -j chef-client.json\n",
+                                        "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:", { "Ref": "AlfrescoPassword" }, " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
+                                        "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:", { "Ref": "AlfrescoPassword" }, " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n"
                                     ]
                                 ]
                             }
