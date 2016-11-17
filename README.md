@@ -117,6 +117,20 @@ chmod 400 your-priv-key.pem
 ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP
 ```
 
+### Starting and Stopping Services
+
+When you are logged in to the servers as root user, you can stop, start, or restart the Alfresco-related services on the Alfresco One and Index servers as follows:
+```
+systemctl {start,stop,restart} tomcat-alfresco
+systemctl {start,stop,restart} tomcat-share
+systemctl {start,stop,restart} tomcat-solr
+systemctl {start,stop,restart} haproxy
+systemctl {start,stop,restart} nginx
+```
+
+Note: On the Index servers, only tomcat-solr and tomcat-alfresco are available. And only tomcat-share, tomcat-alfresco, haproxy and nginx is available on the Alfresco servers.
+
+
 ### Logs and Configuration Files Location
 * Logs for Alfresco and Share on the Alfresco Instances
 ```
@@ -173,10 +187,8 @@ ssh -i your-priv-key.pem centos@ALFRESCO-OR-INDEX-SERVER-IP
 ```
 /etc/nginx/nginx.conf
 /var/log/nginx/
-systemctl {start,stop,restart,status} nginx
 /etc/haproxy/haproxy.cfg
 /var/log/haproxy/
-systemctl {start,stop,restart,status} haproxy
 ```
 
 License
