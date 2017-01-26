@@ -140,13 +140,13 @@
             "ConstraintDescription": "Must be a valid email address."
         },
         "SSHFrom": {
-            "Description": "Lockdown SSH access to the bastion host (default can be accessed from anywhere)",
+            "Description": "Lockdown SSH access to the bastion host",
             "Type": "String",
             "MinLength": "9",
             "MaxLength": "18",
             "Default": "0.0.0.0/0",
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "ConstraintDescription": "Must be a valid CIDR range of the form x.x.x.x/x."
+            "ConstraintDescription": "Must be a valid CIDR range of the form x.x.x.x/x, like 0.0.0.0/0 or fixed IP like x.x.x.x/32."
         },
         "AZ1": {
             "Type": "AWS::EC2::AvailabilityZone::Name",
@@ -1374,8 +1374,6 @@
                                 "systemctl stop tomcat-solr\n",
                                 "systemctl disable tomcat-solr\n",
                                 "yum remove -y mysql-server\n",
-                                "#echo 'timeout=120' >> /etc/yum.conf\n",
-                                "#yum clean all\n",
                                 "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                 "rm -fr /etc/tomcat-solr /var/lib/tomcat-solr /usr/share/tomcat-solr /var/log/tomcat-solr /var/cache/tomcat-solr /usr/share/tomcat/alf_data/solrhome /usr/share/tomcat/alf_data/solrContentStore /usr/share/tomcat/alf_data/solr4Backup /usr/share/tomcat/alf_data/newAlfrescoModels /etc/sysconfig/tomcat-solr /etc/cron.d/solr-cleaner.cron /usr/lib/systemd/system/tomcat-solr.service\n",
                                 "cd /etc/chef; chef-client -z -j chef-client.json\n",
@@ -1637,8 +1635,6 @@
                                         "systemctl stop tomcat-solr\n",
                                         "systemctl disable tomcat-solr\n",
                                         "yum remove -y mysql-server\n",
-                                        "#echo 'timeout=120' >> /etc/yum.conf\n",
-                                        "#yum clean all\n",
                                         "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                         "rm -fr /etc/tomcat-share /var/lib/tomcat-share /usr/share/tomcat-share /var/log/tomcat-share /var/cache/tomcat-share /etc/sysconfig/tomcat-share /usr/lib/systemd/system/tomcat-share.service\n",
                                         "cd /etc/chef; chef-client -z -j chef-client.json\n",
