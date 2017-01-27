@@ -1037,7 +1037,9 @@
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco/web-extension/share-cluster-application-context.xml\n",
                                             "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
+                                            "rm -fr /etc/chef/run.sh\n",
+                                            "export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone|rev| cut -c2-|rev)\n",
+                                            "if [ $REGION != \"us-east-1\" ]; then echo \"s3service.s3-endpoint=s3-$REGION.amazonaws.com\" >> /usr/share/tomcat/shared/classes/alfresco-global.properties ; fi\n"
                                         ]
                                     ]
                                 },
@@ -1421,7 +1423,9 @@
                                             "rm -fr /etc/chef/nodes/*.json\n",
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
                                             "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
+                                            "rm -fr /etc/chef/run.sh\n",
+                                            "export REGION=$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone|rev| cut -c2-|rev)\n",
+                                            "if [ $REGION != \"us-east-1\" ]; then echo \"s3service.s3-endpoint=s3-$REGION.amazonaws.com\" >> /usr/share/tomcat/shared/classes/alfresco-global.properties ; fi\n"
                                         ]
                                     ]
                                 },
