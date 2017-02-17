@@ -954,7 +954,7 @@
                                             {
                                                 "Ref": "QSS3KeyPrefix"
                                             },
-                                            "scripts/share-51.json"
+                                            "scripts/share-52.json"
                                         ]
                                     ]
                                 },
@@ -1075,24 +1075,17 @@
                                             "systemctl disable tomcat-solr\n",
                                             "yum remove -y mysql-server\n",
                                             "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
-                                            "rm -fr /etc/tomcat-solr /var/lib/tomcat-solr /usr/share/tomcat-solr /var/log/tomcat-solr /var/cache/tomcat-solr /usr/share/tomcat/alf_data/solrhome /usr/share/tomcat/alf_data/solrContentStore /usr/share/tomcat/alf_data/solr4Backup /usr/share/tomcat/alf_data/newAlfrescoModels /etc/sysconfig/tomcat-solr /etc/cron.d/solr-cleaner.cron /usr/lib/systemd/system/tomcat-solr.service\n",
+                                            "service solr stop\n",
+                                            "chkconfig disable solr\n",
+                                            "rm -rf /opt/alfresco-search-services /var/solr /etc/init.d/solr /etc/sysconfig/solr /var/log/solr\n",
+                                            "userdel -r solr\n",
                                             "cd /etc/chef; chef-client -z -j chef-client.json\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n",
-                                            "rm -fr /etc/chef/chef-client.json\n",
-                                            "rm -fr /etc/chef/nodes/*.json\n",
+                                            "#rm -fr /etc/chef/chef-client.json\n",
+                                            "#rm -fr /etc/chef/nodes/*.json\n",
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco/web-extension/share-cluster-application-context.xml\n",
-                                            "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
+                                            "#rm -fr /etc/chef/replaceValues.sh\n",
+                                            "#rm -fr /etc/chef/run.sh\n"
                                         ]
                                     ]
                                 },
@@ -1342,7 +1335,7 @@
                                             {
                                                 "Ref": "QSS3KeyPrefix"
                                             },
-                                            "scripts/solr-51.json"
+                                            "scripts/solr-52.json"
                                         ]
                                     ]
                                 },
@@ -1467,27 +1460,17 @@
                                             "rm -fr /var/log/haproxy\n",
                                             "systemctl stop mysql-default\n",
                                             "systemctl disable mysql-default\n",
-                                            "systemctl stop tomcat-solr\n",
-                                            "systemctl disable tomcat-solr\n",
+                                            "systemctl stop tomcat-share\n",
+                                            "systemctl disable tomcat-share\n",
                                             "yum remove -y mysql-server\n",
                                             "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                             "rm -fr /etc/tomcat-share /var/lib/tomcat-share /usr/share/tomcat-share /var/log/tomcat-share /var/cache/tomcat-share /etc/sysconfig/tomcat-share /usr/lib/systemd/system/tomcat-share.service\n",
                                             "cd /etc/chef; chef-client -z -j chef-client.json\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n",
-                                            "rm -fr /etc/chef/chef-client.json\n",
-                                            "rm -fr /etc/chef/nodes/*.json\n",
+                                            "#rm -fr /etc/chef/chef-client.json\n",
+                                            "#rm -fr /etc/chef/nodes/*.json\n",
                                             "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
-                                            "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
+                                            "#rm -fr /etc/chef/replaceValues.sh\n",
+                                            "#rm -fr /etc/chef/run.sh\n"
                                         ]
                                     ]
                                 },

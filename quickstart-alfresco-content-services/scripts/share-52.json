@@ -1,6 +1,14 @@
 {
     "name": "share",
-    "semaphore" : { "s3_bucket_name" : "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828" },
+    "semaphore" : {
+      "s3_bucket_lock" : {
+       "name": "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828"
+     },
+     "s3_bucket_done" : {
+      "name": "@@CONTENTSTORE_S3_BUCKET@@",
+      "aws_region": "@@AWS_REGION@@"
+     }
+    },
     "chef_client" : {
       "config" : {
         "yum_lock_timeout" : 120
@@ -10,7 +18,7 @@
       "use_nossl_config" : true
     },
     "alfresco" : {
-        "use_libreoffice_os_repo" : true,
+        "components" : ["haproxy","nginx","tomcat","transform","repo","share","googledocs","aos"],
         "db_ssl_enabled" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
