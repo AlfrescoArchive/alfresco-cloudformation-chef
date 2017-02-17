@@ -1,0 +1,754 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "This master template creates a VPC infrastructure for a multi-AZ, multi-tier deployment of Alfresco Content Services 5.2 on AWS. It deploys a VPC with bastions and an Alfresco cluster behind an ELB. The cluster is configured to use an S3 bucket for storage and a multi-AZ Amazon RDS MySQL instance for the database. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template.",
+    "Metadata": {
+        "AWS::CloudFormation::Interface": {
+            "ParameterGroups": [
+                {
+                    "Label": {
+                        "default": "Network Configuration"
+                    },
+                    "Parameters": [
+                        "AvailabilityZones",
+                        "VPCCIDR",
+                        "PrivateSubnet1CIDR",
+                        "PrivateSubnet2CIDR",
+                        "PublicSubnet1CIDR",
+                        "PublicSubnet2CIDR",
+                        "RemoteAccessCIDR"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Amazon EC2 Configuration"
+                    },
+                    "Parameters": [
+                        "KeyPairName",
+                        "Bastion1InstanceType",
+                        "Bastion1PrivateIP",
+                        "Bastion2InstanceType",
+                        "Bastion2PrivateIP",
+                        "AlfrescoInstanceType",
+                        "IndexInstanceType"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Alfresco General Configuration"
+                    },
+                    "Parameters": [
+                        "AlfrescoPassword",
+                        "AlfrescoTrialLicense"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Alfresco Nodes Configuration"
+                    },
+                    "Parameters": [
+                        "AlfrescoNodesMinSize",
+                        "AlfrescoNodesMaxSize",
+                        "AlfrescoNodesDesiredCapacity",
+                        "IndexNodesMinSize",
+                        "IndexNodesMaxSize",
+                        "IndexNodesDesiredCapacity",
+                        "OperatorEmail"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "Alfresco Storage Configuration"
+                    },
+                    "Parameters": [
+                        "RDSInstanceType",
+                        "RDSDBName",
+                        "RDSUsername",
+                        "RDSPassword",
+                        "S3BucketName"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "AWS Quick Start Configuration"
+                    },
+                    "Parameters": [
+                        "QSS3BucketName",
+                        "QSS3KeyPrefix"
+                    ]
+                }
+            ],
+            "ParameterLabels": {
+                "AlfrescoInstanceType": {
+                    "default": "Alfresco Servers Instance Type"
+                },
+                "AlfrescoNodesDesiredCapacity": {
+                    "default": "Alfresco Nodes Desired Capacity"
+                },
+                "AlfrescoNodesMaxSize": {
+                    "default": "Alfresco Nodes Max Size"
+                },
+                "AlfrescoNodesMinSize": {
+                    "default": "Alfresco Nodes Min Size"
+                },
+                "AlfrescoPassword": {
+                    "default": "Alfresco Admin Password"
+                },
+                "AlfrescoTrialLicense": {
+                    "default": "Alfresco Trial License Location URL"
+                },
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
+                "Bastion1InstanceType": {
+                    "default": "Bastion 1 Instance Type"
+                },
+                "Bastion1PrivateIP": {
+                    "default": "Bastion 1 Private IP Address"
+                },
+                "Bastion2InstanceType": {
+                    "default": "Bastion 2 Instance Type"
+                },
+                "Bastion2PrivateIP": {
+                    "default": "Bastion 2 Private IP Address"
+                },
+                "IndexInstanceType": {
+                    "default": "Index Servers Instance Type"
+                },
+                "IndexNodesDesiredCapacity": {
+                    "default": "Index Nodes Desired Capacity"
+                },
+                "IndexNodesMaxSize": {
+                    "default": "Index Nodes Max Size"
+                },
+                "IndexNodesMinSize": {
+                    "default": "Index Nodes Min Size"
+                },
+                "KeyPairName": {
+                    "default": "Key Pair Name"
+                },
+                "OperatorEmail": {
+                    "default": "Operator Email"
+                },
+                "PrivateSubnet1CIDR": {
+                    "default": "Private Subnet 1 CIDR"
+                },
+                "PrivateSubnet2CIDR": {
+                    "default": "Private Subnet 2 CIDR"
+                },
+                "PublicSubnet1CIDR": {
+                    "default": "Public Subnet 1 CIDR"
+                },
+                "PublicSubnet2CIDR": {
+                    "default": "Public Subnet 2 CIDR"
+                },
+                "QSS3BucketName": {
+                    "default": "Quick Start S3 Bucket Name"
+                },
+                "QSS3KeyPrefix": {
+                    "default": "Quick Start S3 Key Prefix"
+                },
+                "RDSDBName": {
+                    "default": "RDS DB Name"
+                },
+                "RDSInstanceType": {
+                    "default": "RDS Instance Type"
+                },
+                "RDSPassword": {
+                    "default": "RDS Password"
+                },
+                "RDSUsername": {
+                    "default": "RDS User Name"
+                },
+                "S3BucketName": {
+                    "default": "S3 Bucket Name"
+                },
+                "RemoteAccessCIDR": {
+                    "default": "Allowed Bastion External Access CIDR"
+                },
+                "VPCCIDR": {
+                    "default": "VPC CIDR"
+                }
+            }
+        }
+    },
+    "Parameters": {
+        "AlfrescoInstanceType": {
+            "AllowedValues": [
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "r3.large",
+                "r3.xlarge"
+            ],
+            "ConstraintDescription": "Must contain valid instance type",
+            "Default": "m4.xlarge",
+            "Description": "EC2 instance type for the Alfresco instances (Alfresco Share + repository)",
+            "Type": "String"
+        },
+        "AlfrescoNodesDesiredCapacity": {
+            "Default": "2",
+            "Description": "The desired capacity for the Alfresco nodes Auto Scaling group",
+            "Type": "String"
+        },
+        "AlfrescoNodesMaxSize": {
+            "Default": "4",
+            "Description": "The maximum size of the Auto Scaling group",
+            "Type": "String"
+        },
+        "AlfrescoNodesMinSize": {
+            "Default": "2",
+            "Description": "The minimum size of the Auto Scaling group",
+            "Type": "String"
+        },
+        "AlfrescoPassword": {
+            "Description": "Password for the Alfresco admin user",
+            "NoEcho": "True",
+            "Type": "String"
+        },
+        "AlfrescoTrialLicense": {
+            "Default": "Type a public URL, e.g., URL to an S3 bucket that contains your license",
+            "Description": "URL of your Alfresco trial license *with clustering enabled*. If you don't have a license, please request one from your sales representative or contact Alfresco Support at http://support.alfresco.com.",
+            "Type": "String"
+        },
+        "AvailabilityZones": {
+            "Description": "List of Availability Zones to use for the subnets in the VPC. Only two Availability Zones are used for this deployment, and the logical order of your selections is preserved.",
+            "Type": "List<AWS::EC2::AvailabilityZone::Name>"
+        },
+        "Bastion1InstanceType": {
+            "Description": "EC2 instance type for the first bastion host instance located in Availability Zone 1",
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.nano",
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge"
+            ]
+        },
+        "Bastion1PrivateIP": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",
+            "ConstraintDescription": "IP address parameter must be in the form x.x.x.x",
+            "Default": "10.0.128.5",
+            "Description": "Fixed private IP for the first bastion host instance located in Availability Zone 1",
+            "Type": "String"
+        },
+        "Bastion2InstanceType": {
+            "Description": "EC2 instance type for the second bastion host instance located in Availability Zone 2",
+            "Type": "String",
+            "Default": "t2.micro",
+            "AllowedValues": [
+                "t2.nano",
+                "t2.micro",
+                "t2.small",
+                "t2.medium",
+                "t2.large",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge"
+            ]
+        },
+        "Bastion2PrivateIP": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$",
+            "ConstraintDescription": "IP address parameter must be in the form x.x.x.x",
+            "Default": "10.0.144.5",
+            "Description": "Fixed private IP for the second bastion host instance located in Availability Zone 2",
+            "Type": "String"
+        },
+        "IndexInstanceType": {
+            "AllowedValues": [
+                "t2.large",
+                "m4.large",
+                "m4.xlarge",
+                "m4.2xlarge",
+                "m4.4xlarge",
+                "m4.10xlarge",
+                "m3.medium",
+                "m3.large",
+                "m3.xlarge",
+                "m3.2xlarge",
+                "c4.large",
+                "c4.xlarge",
+                "c4.2xlarge",
+                "c4.4xlarge",
+                "c4.8xlarge",
+                "c3.large",
+                "c3.xlarge",
+                "c3.2xlarge",
+                "c3.4xlarge",
+                "c3.8xlarge",
+                "r3.large",
+                "r3.xlarge"
+            ],
+            "ConstraintDescription": "Must contain valid instance type",
+            "Default": "m4.xlarge",
+            "Description": "EC2 instance type for the Alfresco Index server (Solr) instances",
+            "Type": "String"
+        },
+        "IndexNodesDesiredCapacity": {
+            "Default": "2",
+            "Description": "The desired capacity for the Auto Scaling group for Index server instances",
+            "Type": "String"
+        },
+        "IndexNodesMaxSize": {
+            "Default": "4",
+            "Description": "The maximum size of the Auto Scaling group",
+            "Type": "String"
+        },
+        "IndexNodesMinSize": {
+            "Default": "2",
+            "Description": "The minimum size of the Auto Scaling group",
+            "Type": "String"
+        },
+        "KeyPairName": {
+            "Description": "The name of an existing public/private key pair, which allows you to securely connect to your instance after it launches",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "OperatorEmail": {
+            "AllowedPattern": "([a-zA-Z0-9_\\-\\.]+)@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.)|(([a-zA-Z0-9\\-]+\\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\\]?)",
+            "ConstraintDescription": "Must be a valid email address.",
+            "Description": "Email address that notifications of any scaling operations will be sent to",
+            "Type": "String"
+        },
+        "PrivateSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.0.0/19",
+            "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
+            "Type": "String"
+        },
+        "PrivateSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.32.0/19",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 2",
+            "Type": "String"
+        },
+        "PublicSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.128.0/20",
+            "Description": "CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1",
+            "Type": "String"
+        },
+        "PublicSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.144.0/20",
+            "Description": "CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2",
+            "Type": "String"
+        },
+        "QSS3BucketName": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "ConstraintDescription": "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Default": "quickstart-reference",
+            "Description": "S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).",
+            "Type": "String"
+        },
+        "QSS3KeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
+            "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with a forward slash (/), which is automatically appended.",
+            "Default": "alfresco/one/latest",
+            "Description": "S3 key prefix for the Quick Start assets. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with a forward slash (/), which is automatically appended.",
+            "Type": "String"
+        },
+        "RDSDBName": {
+            "Default": "alfresco",
+            "Description": "DB name for the Amazon RDS MySQL database",
+            "Type": "String"
+        },
+        "RDSInstanceType": {
+            "AllowedValues": [
+                "db.t2.medium",
+                "db.t2.large",
+                "db.m3.medium",
+                "db.m3.large",
+                "db.m3.xlarge",
+                "db.m3.2xlarge",
+                "db.r3.large",
+                "db.r3.xlarge",
+                "db.r3.2xlarge",
+                "db.r3.4xlarge",
+                "db.r3.8xlarge",
+                "db.t2.micro",
+                "db.t2.small",
+                "db.t2.medium",
+                "db.t2.large",
+                "db.m4.medium",
+                "db.m4.large",
+                "db.m4.xlarge"
+            ],
+            "ConstraintDescription": "Must contain valid RDS instance type",
+            "Default": "db.t2.small",
+            "Description": "EC2 instance type for the Amazon RDS MySQL DB instances",
+            "Type": "String"
+        },
+        "RDSPassword": {
+            "Description": "Password for the Amazon RDS MySQL database",
+            "NoEcho": "True",
+            "Type": "String"
+        },
+        "RDSUsername": {
+            "Default": "alfresco",
+            "Description": "User name for the Amazon RDS MySQL database",
+            "Type": "String"
+        },
+        "RemoteAccessCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/x",
+            "Description": "The CIDR IP range that is permitted to access the Alfresco One software. We recommend that you set this value to a trusted IP range.",
+            "Type": "String"
+        },
+        "S3BucketName": {
+            "Default": "",
+            "Description": "Name of the S3 bucket that will be created for Alfresco to store data. Enter a unique name that does not include uppercase characters.",
+            "Type": "String"
+        },
+        "VPCCIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.0.0/16",
+            "Description": "CIDR block for the VPC",
+            "Type": "String"
+        }
+    },
+    "Mappings": {
+        "AWSInfoRegionMap": {
+            "ap-northeast-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "ap-northeast-2": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "ap-south-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "ap-southeast-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "ap-southeast-2": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "eu-central-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "eu-west-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "sa-east-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "us-east-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "us-east-2": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "us-west-1": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            },
+            "us-west-2": {
+                "Partition": "aws",
+                "QuickStartS3URL": "https://s3.amazonaws.com"
+            }
+        }
+    },
+    "Resources": {
+        "VPCStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            {
+                                "Fn::FindInMap": [
+                                    "AWSInfoRegionMap",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    "QuickStartS3URL"
+                                ]
+                            },
+                            {
+                                "Ref": "QSS3BucketName"
+                            },
+                            {
+                                "Ref": "QSS3KeyPrefix"
+                            },
+                            "submodules/quickstart-aws-vpc",
+                            "templates/aws-vpc.template"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "AvailabilityZones": {
+                        "Fn::Join": [
+                            ",",
+                            {
+                                "Ref": "AvailabilityZones"
+                            }
+                        ]
+                    },
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "NumberOfAZs": "2",
+                    "PrivateSubnet1ACIDR": {
+                        "Ref": "PrivateSubnet1CIDR"
+                    },
+                    "PrivateSubnet2ACIDR": {
+                        "Ref": "PrivateSubnet2CIDR"
+                    },
+                    "PublicSubnet1CIDR": {
+                        "Ref": "PublicSubnet1CIDR"
+                    },
+                    "PublicSubnet2CIDR": {
+                        "Ref": "PublicSubnet2CIDR"
+                    },
+                    "VPCCIDR": {
+                        "Ref": "VPCCIDR"
+                    }
+                }
+            }
+        },
+        "BastionStack": {
+            "DependsOn": "VPCStack",
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            {
+                                "Fn::FindInMap": [
+                                    "AWSInfoRegionMap",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    "QuickStartS3URL"
+                                ]
+                            },
+                            {
+                                "Ref": "QSS3BucketName"
+                            },
+                            {
+                                "Ref": "QSS3KeyPrefix"
+                            },
+                            "submodules/quickstart-linux-bastion",
+                            "templates/linux-bastion.template"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "Bastion1InstanceType": {
+                        "Ref": "Bastion1InstanceType"
+                    },
+                    "Bastion1PrivateIP": {
+                        "Ref": "Bastion1PrivateIP"
+                    },
+                    "Bastion2InstanceType": {
+                        "Ref": "Bastion2InstanceType"
+                    },
+                    "Bastion2PrivateIP": {
+                        "Ref": "Bastion2PrivateIP"
+                    },
+                    "BastionAMIOS": "AmazonLinuxHVM",
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "RemoteAccessCIDR": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    }
+                }
+            }
+        },
+        "AlfrescoStack": {
+            "DependsOn": "BastionStack",
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            {
+                                "Fn::FindInMap": [
+                                    "AWSInfoRegionMap",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    "QuickStartS3URL"
+                                ]
+                            },
+                            {
+                                "Ref": "QSS3BucketName"
+                            },
+                            {
+                                "Ref": "QSS3KeyPrefix"
+                            },
+                            "templates/alfresco-content-services.template"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "AlfrescoInstanceType": {
+                        "Ref": "AlfrescoInstanceType"
+                    },
+                    "AlfrescoNodesDesiredCapacity": {
+                        "Ref": "AlfrescoNodesDesiredCapacity"
+                    },
+                    "AlfrescoNodesMaxSize": {
+                        "Ref": "AlfrescoNodesMaxSize"
+                    },
+                    "AlfrescoNodesMinSize": {
+                        "Ref": "AlfrescoNodesMinSize"
+                    },
+                    "AlfrescoPassword": {
+                        "Ref": "AlfrescoPassword"
+                    },
+                    "AlfrescoTrialLicense": {
+                        "Ref": "AlfrescoTrialLicense"
+                    },
+                    "BastionSecurityGroupID": {
+                        "Fn::GetAtt": [
+                            "BastionStack",
+                            "Outputs.BastionSecurityGroupID"
+                        ]
+                    },
+                    "IndexInstanceType": {
+                        "Ref": "IndexInstanceType"
+                    },
+                    "IndexNodesDesiredCapacity": {
+                        "Ref": "IndexNodesDesiredCapacity"
+                    },
+                    "IndexNodesMaxSize": {
+                        "Ref": "IndexNodesMaxSize"
+                    },
+                    "IndexNodesMinSize": {
+                        "Ref": "IndexNodesMinSize"
+                    },
+                    "KeyPairName": {
+                        "Ref": "KeyPairName"
+                    },
+                    "OperatorEmail": {
+                        "Ref": "OperatorEmail"
+                    },
+                    "PrivateSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1AID"
+                        ]
+                    },
+                    "PrivateSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2AID"
+                        ]
+                    },
+                    "PublicSubnet1ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "PublicSubnet2ID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet2ID"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "RDSDBName": {
+                        "Ref": "RDSDBName"
+                    },
+                    "RDSInstanceType": {
+                        "Ref": "RDSInstanceType"
+                    },
+                    "RDSPassword": {
+                        "Ref": "RDSPassword"
+                    },
+                    "RDSUsername": {
+                        "Ref": "RDSUsername"
+                    },
+                    "S3BucketName": {
+                        "Ref": "S3BucketName"
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
