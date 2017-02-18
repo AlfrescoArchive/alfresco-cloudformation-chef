@@ -42,7 +42,7 @@
         },
         "properties" : {
             "dir.root" : "/usr/share/tomcat/alf_data",
-            "jodconverter.officeHome" : "/opt/libreoffice4.4",
+            "jodconverter.officeHome" : "/opt/libreoffice5.2",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",
@@ -73,6 +73,13 @@
         "ec2" : {
             "install_haproxy_discovery" : true,
             "discovery_enabled" : true
+        },
+        "backends" : {
+          "roles" : {
+            "solr" : {
+              "port" : 8090
+            }
+          }
         }
     },
     "commons" : {
@@ -109,5 +116,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
+    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco-webserver::start", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }

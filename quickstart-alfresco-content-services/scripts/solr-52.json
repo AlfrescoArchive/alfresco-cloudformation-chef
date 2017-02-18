@@ -21,10 +21,10 @@
         "rmi_server_hostname" : "localhost",
         "public_hostname" : "@@FQDN@@",
         "log.json.enabled" : false,
-        "components" : ["repo","solr6"],
         "ssl_enabled" : false,
         "properties" : {
             "alfresco.cluster.enabled" : false,
+            "jodconverter.officeHome" : "/opt/libreoffice5.2",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",

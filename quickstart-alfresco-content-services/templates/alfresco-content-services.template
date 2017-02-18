@@ -935,29 +935,7 @@
                     "Install": {
                         "files": {
                             "/etc/chef/chef-client.json": {
-                                "source": {
-                                    "Fn::Join": [
-                                        "/",
-                                        [
-                                            {
-                                                "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
-                                                    {
-                                                        "Ref": "AWS::Region"
-                                                    },
-                                                    "QuickStartS3URL"
-                                                ]
-                                            },
-                                            {
-                                                "Ref": "QSS3BucketName"
-                                            },
-                                            {
-                                                "Ref": "QSS3KeyPrefix"
-                                            },
-                                            "scripts/share-52.json"
-                                        ]
-                                    ]
-                                },
+                                "source": "https://s3.amazonaws.com/cfn-templates-qs/scripts/share-52.json",
                                 "mode": "000700",
                                 "owner": "root",
                                 "group": "root"
@@ -1316,29 +1294,7 @@
                     "Install": {
                         "files": {
                             "/etc/chef/chef-client.json": {
-                                "source": {
-                                    "Fn::Join": [
-                                        "/",
-                                        [
-                                            {
-                                                "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
-                                                    {
-                                                        "Ref": "AWS::Region"
-                                                    },
-                                                    "QuickStartS3URL"
-                                                ]
-                                            },
-                                            {
-                                                "Ref": "QSS3BucketName"
-                                            },
-                                            {
-                                                "Ref": "QSS3KeyPrefix"
-                                            },
-                                            "scripts/solr-52.json"
-                                        ]
-                                    ]
-                                },
+                                "source": "https://s3.amazonaws.com/cfn-templates-qs/scripts/solr-52.json",
                                 "mode": "000700",
                                 "owner": "root",
                                 "group": "root"
