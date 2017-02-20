@@ -26,7 +26,6 @@
         "log.json.enabled" : false,
         "public_protocol" : "http",
         "public_portssl" : "80",
-        "components" : ["repo","share"],
         "ssl_enabled" : false,
         "shared" : "/usr/share/tomcat/shared",
         "generate.share.config.custom" : true,
