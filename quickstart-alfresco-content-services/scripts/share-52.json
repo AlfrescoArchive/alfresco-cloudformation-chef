@@ -73,13 +73,6 @@
         "ec2" : {
             "install_haproxy_discovery" : true,
             "discovery_enabled" : true
-        },
-        "backends" : {
-          "roles" : {
-            "solr" : {
-              "port" : 8090
-            }
-          }
         }
     },
     "commons" : {
