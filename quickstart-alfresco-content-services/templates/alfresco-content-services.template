@@ -399,7 +399,7 @@
                 "ALFRESCOONEHVM": "ami-5c51cd30"
             },
             "us-east-1": {
-                "ALFRESCOONEHVM": "ami-86e93c90"
+                "ALFRESCOONEHVM": "ami-37ac7b21"
             },
             "us-east-2": {
                 "ALFRESCOONEHVM": "ami-63257f06"
@@ -1055,7 +1055,7 @@
                                             "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
                                             "service solr stop\n",
                                             "chkconfig disable solr\n",
-                                            "rm -rf /opt/alfresco-search-services /var/solr /etc/init.d/solr /etc/sysconfig/solr /var/log/solr\n",
+                                            "rm -rf /opt/alfresco-search-services /var/solr /etc/init.d/solr /etc/sysconfig/solr /var/log/solr /etc/default/solr.in.sh \n",
                                             "userdel -r solr\n",
                                             "cd /etc/chef; chef-client -z -j chef-client.json\n",
                                             "#rm -fr /etc/chef/chef-client.json\n",

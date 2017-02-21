@@ -1,14 +1,19 @@
 {
     "name": "share",
     "semaphore" : {
-      "s3_bucket_lock" : {
-       "name": "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828"
-     },
-     "s3_bucket_done" : {
-      "name": "@@CONTENTSTORE_S3_BUCKET@@",
-      "aws_region": "@@AWS_REGION@@"
-     }
-    },
+         "wait_while_service_up":{
+              "force_wait": false
+           },
+          "parallel": true,
+          "service_url" : "http://localhost:8070/alfresco",
+          "s3_bucket_lock" : {
+           "name": "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828"
+         },
+         "s3_bucket_done" : {
+          "name": "@@CONTENTSTORE_S3_BUCKET@@",
+          "aws_region": "@@AWS_REGION@@"
+         }
+        },
     "chef_client" : {
       "config" : {
         "yum_lock_timeout" : 120
@@ -40,8 +45,7 @@
           "alfresco.port" : "8070"
         },
         "properties" : {
-            "dir.root" : "/usr/share/tomcat/alf_data",
-            "jodconverter.officeHome" : "/opt/libreoffice5.2",
+            "jodconverter.officeHome" : "/opt/libreoffice5.2/",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",

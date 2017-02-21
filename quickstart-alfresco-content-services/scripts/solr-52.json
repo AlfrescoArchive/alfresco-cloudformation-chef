@@ -1,6 +1,11 @@
 {
     "name": "solr",
     "semaphore" : {
+         "wait_while_service_up":{
+              "force_wait": false
+           },
+          "parallel": true,
+          "service_url" : "http://localhost:8070/alfresco",
           "s3_bucket_lock" : {
            "name": "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828"
          },
@@ -24,7 +29,7 @@
         "ssl_enabled" : false,
         "properties" : {
             "alfresco.cluster.enabled" : false,
-            "jodconverter.officeHome" : "/opt/libreoffice5.2",
+            "jodconverter.officeHome" : "/opt/libreoffice5.2/",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",
@@ -44,7 +49,10 @@
         }
     },
     "solr6" : {
-      "xmx_ratio" : 0.3
+      "xmx_ratio" : 0.3,
+      "solrcore-properties" : {
+        "alfresco.host" : "localhost"
+      }
     },
     "tomcat" : {
         "cleaner.minutes.interval" : 1,
@@ -55,7 +63,7 @@
         "aws_region" : "@@AWS_REGION@@"
       },
       "ec2_tags" : {
-        "haproxy_backends" : "solr",
+        "haproxy_backends" : "solr6",
         "jvm_route" : "@@JVM_ROUTE@@",
         "status" : "complete"
       }
