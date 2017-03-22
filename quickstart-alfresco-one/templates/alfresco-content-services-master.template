@@ -549,7 +549,9 @@
                     ]
                 },
                 "Parameters": {
-                    "BastionAMIOS": "Amazon-Linux-HVM",
+                    "BastionAMIOS": {
+                        "Ref": "BastionAMIOS"
+                    },
                     "BastionInstanceType": {
                         "Ref": "BastionInstanceType"
                     },
@@ -598,7 +600,29 @@
             "DependsOn": "BastionStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
-                "TemplateURL": "https://s3.amazonaws.com/cfn-templates-qs/alfresco-content-services.template",
+                "TemplateURL": {
+                  "Fn::Join": [
+                      "/",
+                      [
+                          {
+                              "Fn::FindInMap": [
+                                  "AWSInfoRegionMap",
+                                  {
+                                      "Ref": "AWS::Region"
+                                  },
+                                  "QuickStartS3URL"
+                              ]
+                          },
+                          {
+                              "Ref": "QSS3BucketName"
+                          },
+                          {
+                              "Ref": "QSS3KeyPrefix"
+                          },
+                          "templates/alfresco-content-services.template"
+                      ]
+                  ]
+                },
                 "Parameters": {
                     "AlfrescoInstanceType": {
                         "Ref": "AlfrescoInstanceType"
