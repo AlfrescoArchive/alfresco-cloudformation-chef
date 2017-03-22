@@ -1,6 +1,19 @@
 {
     "name": "share",
-    "semaphore" : { "s3_bucket_name" : "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828" },
+    "semaphore" : {
+         "wait_while_service_up":{
+              "force_wait": false
+           },
+          "parallel": true,
+          "service_url" : "http://localhost:8070/alfresco",
+          "s3_bucket_lock" : {
+           "name": "@@CONTENTSTORE_S3_BUCKET@@-928274"
+         },
+         "s3_bucket_done" : {
+          "name": "@@CONTENTSTORE_S3_BUCKET@@",
+          "aws_region": "@@AWS_REGION@@"
+         }
+        },
     "chef_client" : {
       "config" : {
         "yum_lock_timeout" : 120
@@ -10,7 +23,7 @@
       "use_nossl_config" : true
     },
     "alfresco" : {
-        "use_libreoffice_os_repo" : true,
+        "components" : ["haproxy","nginx","tomcat","transform","repo","share","googledocs","aos"],
         "db_ssl_enabled" : true,
         "skip_certificate_creation" : true,
         "rmi_server_hostname" : "localhost",
@@ -18,7 +31,6 @@
         "log.json.enabled" : false,
         "public_protocol" : "http",
         "public_portssl" : "80",
-        "components" : ["repo","share"],
         "ssl_enabled" : false,
         "shared" : "/usr/share/tomcat/shared",
         "generate.share.config.custom" : true,
@@ -33,8 +45,7 @@
           "alfresco.port" : "8070"
         },
         "properties" : {
-            "dir.root" : "/usr/share/tomcat/alf_data",
-            "jodconverter.officeHome" : "/opt/libreoffice4.4",
+            "jodconverter.officeHome" : "/opt/libreoffice5.2/",
             "s3.accessKey" : "@@AWS_ACCESS_KEY@@",
             "s3.secretKey" : "@@AWS_SECRET_KEY@@",
             "db.host" : "@@DB_HOST@@",
@@ -101,5 +112,5 @@
             "type" : "amp"
         }
     },
-    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco::nginx-conf", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
+    "run_list": ["commons::ec2-tagging", "commons::artifact-deployer", "alfresco::apply-amps", "alfresco::share", "alfresco::haproxy", "alfresco-webserver::start", "commons::start_instance", "alfresco::redeploy", "commons::wait_instance", "commons::stop_instance"]
 }

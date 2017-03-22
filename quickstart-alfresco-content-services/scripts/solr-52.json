@@ -7,7 +7,7 @@
           "parallel": true,
           "service_url" : "http://localhost:8070/alfresco",
           "s3_bucket_lock" : {
-           "name": "@@CONTENTSTORE_S3_BUCKET@@-9282744662728828"
+           "name": "@@CONTENTSTORE_S3_BUCKET@@-928274"
          },
          "s3_bucket_done" : {
           "name": "@@CONTENTSTORE_S3_BUCKET@@",

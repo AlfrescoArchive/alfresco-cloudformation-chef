@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "This Alfresco One workload template deploys an Alfresco cluster behind an ELB load balancer in two private subnets. The cluster is configured to use an S3 bucket for storage and a multi-AZ Amazon RDS MySQL instance for the database. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. QS(5025)",
+    "Description": "This Alfresco Content Services 5.2 workload template deploys an Alfresco cluster behind an ELB load balancer in two private subnets. The cluster is configured to use an S3 bucket for storage and a multi-AZ Amazon RDS Aurora instance for the database (MySQL for Frankfurt). **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. QS(5025)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -56,6 +56,7 @@
                     },
                     "Parameters": [
                         "RDSInstanceType",
+                        "RDSAllocatedStorage",
                         "RDSDBName",
                         "RDSUsername",
                         "RDSPassword",
@@ -135,6 +136,9 @@
                 },
                 "RDSInstanceType": {
                     "default": "RDS Instance Type"
+                },
+                "RDSAllocatedStorage": {
+                    "default": "RDS Allocated Storage"
                 },
                 "RDSPassword": {
                     "default": "RDS Password"
@@ -292,49 +296,43 @@
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/), which is automatically appended.",
-            "Default": "alfresco/one/latest",
+            "Default": "alfresco/content/services/latest",
             "Description": "S3 key prefix for the Quick Start assets. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with a forward slash (/), which is automatically appended.",
             "Type": "String"
         },
         "RDSDBName": {
             "Default": "alfresco",
-            "Description": "DB name for the Amazon RDS MySQL database",
+            "Description": "DB name for the Amazon RDS Aurora database (MySQL if Frankfurt).",
             "Type": "String"
         },
         "RDSInstanceType": {
             "AllowedValues": [
+                "db.t2.small",
                 "db.t2.medium",
-                "db.t2.large",
-                "db.m3.medium",
-                "db.m3.large",
-                "db.m3.xlarge",
-                "db.m3.2xlarge",
                 "db.r3.large",
                 "db.r3.xlarge",
                 "db.r3.2xlarge",
                 "db.r3.4xlarge",
-                "db.r3.8xlarge",
-                "db.t2.micro",
-                "db.t2.small",
-                "db.t2.medium",
-                "db.t2.large",
-                "db.m4.medium",
-                "db.m4.large",
-                "db.m4.xlarge"
+                "db.r3.8xlarge"
             ],
             "ConstraintDescription": "Must contain valid RDS instance type",
             "Default": "db.t2.small",
-            "Description": "EC2 instance type for the Amazon RDS MySQL DB instances",
+            "Description": "EC2 instance type for the Amazon RDS instances",
             "Type": "String"
         },
         "RDSPassword": {
-            "Description": "Password for the Amazon RDS MySQL database",
+            "Description": "Password for the Amazon RDS database. Minimum 8 characters.",
             "NoEcho": "True",
             "Type": "String"
         },
         "RDSUsername": {
             "Default": "alfresco",
-            "Description": "User name for the Amazon RDS MySQL database",
+            "Description": "User name for the Amazon RDS database",
+            "Type": "String"
+        },
+        "RDSAllocatedStorage": {
+            "Default": "5",
+            "Description": "Size in GiB for the Amazon RDS MySQL database allocated storage (only Frankfurt)",
             "Type": "String"
         },
         "S3BucketName": {
@@ -372,43 +370,43 @@
     "Mappings": {
         "AWSAMIRegionMap": {
             "AMI": {
-                "ALFRESCOONEHVM": "Alfresco One 5.1.1.5 CloudFormation AMI 0.0.40 - 1477326469-580bd3b9-d7b4-498e-8c54-15e5c39b4087-ami-dd035fca.3"
+                "ALFRESCOCS52": "Alfresco Content Services 5.2.0 AMI 0.0.41"
             },
             "ap-northeast-1": {
-                "ALFRESCOONEHVM": "ami-dfc26fbe"
+                "ALFRESCOCS52": "ami-a99bcece"
             },
             "ap-northeast-2": {
-                "ALFRESCOONEHVM": "ami-c526f2ab"
+                "ALFRESCOCS52": "ami-f920f097"
             },
             "ap-south-1": {
-                "ALFRESCOONEHVM": "ami-93a5d1fc"
+                "ALFRESCOCS52": "ami-981d6df7"
             },
             "ap-southeast-1": {
-                "ALFRESCOONEHVM": "ami-f41ebf97"
+                "ALFRESCOCS52": "ami-9208b9f1"
             },
             "ap-southeast-2": {
-                "ALFRESCOONEHVM": "ami-662f1305"
+                "ALFRESCOCS52": "ami-82cecde1"
             },
             "eu-central-1": {
-                "ALFRESCOONEHVM": "ami-3e936851"
+                "ALFRESCOCS52": "ami-7de53012"
             },
             "eu-west-1": {
-                "ALFRESCOONEHVM": "ami-8292d8f1"
+                "ALFRESCOCS52": "ami-1d68467b"
             },
             "sa-east-1": {
-                "ALFRESCOONEHVM": "ami-5c51cd30"
+                "ALFRESCOCS52": "ami-5587e139"
             },
             "us-east-1": {
-                "ALFRESCOONEHVM": "ami-568bd141"
+                "ALFRESCOCS52": "ami-ac9d43ba"
             },
             "us-east-2": {
-                "ALFRESCOONEHVM": "ami-63257f06"
+                "ALFRESCOCS52": "ami-c4bb9ea1"
             },
             "us-west-1": {
-                "ALFRESCOONEHVM": "ami-cf2268af"
+                "ALFRESCOCS52": "ami-3c97c95c"
             },
             "us-west-2": {
-                "ALFRESCOONEHVM": "ami-7d34921d"
+                "ALFRESCOCS52": "ami-16f97b76"
             }
         },
         "AWSInfoRegionMap": {
@@ -518,7 +516,13 @@
                     ]
                 }
             ]
-        }
+        },
+        "isFrankfurt": {
+            "Fn::Equals" : [ { "Ref":"AWS::Region" }, "eu-central-1" ]
+          },
+        "isNotFrankfurt": {
+            "Fn::Not": [ { "Fn::Equals" : [ { "Ref":"AWS::Region" }, "eu-central-1" ] } ]
+          }
     },
     "Resources": {
         "NotificationTopic": {
@@ -695,7 +699,7 @@
                                                 {
                                                     "Ref": "S3Bucket"
                                                 },
-                                                "-9282744662728828"
+                                                "-928274"
                                             ]
                                         ]
                                     }
@@ -832,6 +836,7 @@
         },
         "RDSDBInstance": {
             "Type": "AWS::RDS::DBInstance",
+            "Condition": "isFrankfurt",
             "Properties": {
                 "MultiAZ": "true",
                 "VPCSecurityGroups": [
@@ -839,7 +844,7 @@
                         "Ref": "RDSSecurityGroup"
                     }
                 ],
-                "AllocatedStorage": "5",
+                "AllocatedStorage": { "Ref": "RDSAllocatedStorage" },
                 "DBInstanceClass": {
                     "Ref": "RDSInstanceType"
                 },
@@ -858,6 +863,54 @@
                 }
             },
             "DeletionPolicy": "Snapshot"
+        },
+        "RDSCluster" : {
+            "Type" : "AWS::RDS::DBCluster",
+            "Condition": "isNotFrankfurt",
+            "Properties" : {
+              "MasterUsername" : { "Ref" : "RDSUsername" },
+              "MasterUserPassword" : { "Ref" : "RDSPassword" },
+              "Engine" : "aurora",
+              "DatabaseName" : {
+                "Ref" : "RDSDBName"
+              },
+              "VpcSecurityGroupIds": [
+                  {
+                      "Ref": "RDSSecurityGroup"
+                  }
+              ],
+              "DBSubnetGroupName" : { "Ref" : "RDSDBSubnetGroup" }
+            }
+        },
+        "RDSDBInstance1" : {
+            "Type" : "AWS::RDS::DBInstance",
+            "Condition": "isNotFrankfurt",
+            "Properties" : {
+              "DBSubnetGroupName" : {
+                "Ref" : "RDSDBSubnetGroup"
+              },
+              "Engine" : "aurora",
+              "DBClusterIdentifier" : {
+                "Ref" : "RDSCluster"
+              },
+              "PubliclyAccessible" : "false",
+              "DBInstanceClass" : { "Ref": "RDSInstanceType" }
+            }
+        },
+        "RDSDBInstance2" : {
+            "Type" : "AWS::RDS::DBInstance",
+            "Condition": "isNotFrankfurt",
+            "Properties" : {
+              "DBSubnetGroupName" : {
+                "Ref" : "RDSDBSubnetGroup"
+              },
+              "Engine" : "aurora",
+              "DBClusterIdentifier" : {
+                "Ref" : "RDSCluster"
+              },
+              "PubliclyAccessible" : "false",
+              "DBInstanceClass" : { "Ref": "RDSInstanceType" }
+            }
         },
         "AlfrescoSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
@@ -908,6 +961,20 @@
                 }
             }
         },
+        "AlfrescoSecurityGroup5802Ingress": {
+            "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+                "GroupId": {
+                    "Ref": "AlfrescoSecurityGroup"
+                },
+                "IpProtocol": "tcp",
+                "FromPort": "5802",
+                "ToPort": "5802",
+                "SourceSecurityGroupId": {
+                    "Ref": "AlfrescoSecurityGroup"
+                }
+            }
+        },
         "AlfrescoSecurityGroup8090Ingress": {
             "Type": "AWS::EC2::SecurityGroupIngress",
             "Properties": {
@@ -924,6 +991,8 @@
         },
         "AlfrescoASLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "DependsOn": [ "RDSCluster", "RDSDBInstance1", "RDSDBInstance2" ],
+            "Condition": "isNotFrankfurt",
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "configSets": {
@@ -935,28 +1004,277 @@
                     "Install": {
                         "files": {
                             "/etc/chef/chef-client.json": {
-                                "source": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/share-52.json"
+                                      ]
+                                  ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            },
+                            "/etc/chef/replaceValues.sh": {
+                                "content": {
                                     "Fn::Join": [
-                                        "/",
+                                        "",
                                         [
+                                            "#!/bin/bash\n",
+                                            "sed -i 's/@@STACK_NAME@@/",
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@FQDN@@/",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "ElasticLoadBalancer",
+                                                    "DNSName"
+                                                ]
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_ACCESS_KEY@@/",
+                                            {
+                                                "Ref": "CfnKeys"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's#@@AWS_SECRET_KEY@@#",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "CfnKeys",
+                                                    "SecretAccessKey"
+                                                ]
+                                            },
+                                            "#g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_HOST@@/",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "RDSCluster",
+                                                    "Endpoint.Address"
+                                                ]
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_NAME@@/",
+                                            {
+                                                "Ref": "RDSDBName"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_USERNAME@@/",
+                                            {
+                                                "Ref": "RDSUsername"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_PASSWORD@@/",
+                                            {
+                                                "Ref": "RDSPassword"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
+                                            {
+                                                "Ref": "S3Bucket"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_REGION@@/",
+                                            {
+                                                "Ref": "AWS::Region"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_S3ENDPOINT@@/",
                                             {
                                                 "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
+                                                    "S3EndPoints",
                                                     {
                                                         "Ref": "AWS::Region"
                                                     },
-                                                    "QuickStartS3URL"
+                                                    "endpoint"
                                                 ]
                                             },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "ALFPASS=$(printf %s ",
                                             {
-                                                "Ref": "QSS3BucketName"
+                                                "Ref": "AlfrescoPassword"
                                             },
+                                            " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                            "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/chef-client.json\n",
+                                            "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
+                                            "sed -i \"s/@@JVM_ROUTE@@/share-$INSTANCEIDX/g\" /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/chef-client.json\n",
+                                            "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)\n",
+                                            "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n",
+                                            "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
+                                            "echo \"$LOCALIP $LOCALSHORTNAME $LOCALNAME\" >> /etc/hosts\n",
+                                            "curl -L ",
                                             {
-                                                "Ref": "QSS3KeyPrefix"
+                                                "Ref": "AlfrescoTrialLicense"
                                             },
-                                            "scripts/share-51.json"
+                                            " -o /usr/share/tomcat/shared/classes/alfresco/extension/license/license.lic\n"
                                         ]
                                     ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            },
+                            "/etc/chef/run.sh": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/run-share.sh"
+                                      ]
+                                  ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            }
+                        }
+                    },
+                    "Configure": {
+                        "commands": {
+                            "01_ReplaceValues": {
+                                "command": "/etc/chef/replaceValues.sh"
+                            },
+                            "02_RunChef": {
+                                "command": "/etc/chef/run.sh"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairName"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "ALFRESCOCS52"
+                    ]
+                },
+                "InstanceMonitoring": "true",
+                "IamInstanceProfile": {
+                    "Ref": "SetupRoleProfile"
+                },
+                "InstanceType": {
+                    "Ref": "AlfrescoInstanceType"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "AlfrescoSecurityGroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "systemctl stop chef-boot.service\n",
+                                "systemctl disable chef-boot.service\n",
+                                "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                "/usr/bin/cfn-init",
+                                "    --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "    --resource AlfrescoASLaunchConfig",
+                                "    --configsets InstallAndRun",
+                                "    --region     ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "# Signal the status from cfn-init\n",
+                                "/usr/bin/cfn-signal -e $? ",
+                                " --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource AlfrescoAutoScalingGroup",
+                                " --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "AlfrescoASLaunchConfigFrankfurt": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "DependsOn": "RDSDBInstance",
+            "Condition": "isFrankfurt",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "configSets": {
+                        "Install2AndRun": [
+                            "Install2",
+                            "Configure"
+                        ]
+                    },
+                    "Install2": {
+                        "files": {
+                            "/etc/chef/chef-client.json": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/share-51.json"
+                                      ]
+                                  ]
                                 },
                                 "mode": "000700",
                                 "owner": "root",
@@ -1064,37 +1382,28 @@
                                 "group": "root"
                             },
                             "/etc/chef/run.sh": {
-                                "content": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "#!/bin/bash\n",
-                                            "systemctl stop mysql-default\n",
-                                            "systemctl disable mysql-default\n",
-                                            "systemctl stop tomcat-solr\n",
-                                            "systemctl disable tomcat-solr\n",
-                                            "yum remove -y mysql-server\n",
-                                            "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
-                                            "rm -fr /etc/tomcat-solr /var/lib/tomcat-solr /usr/share/tomcat-solr /var/log/tomcat-solr /var/cache/tomcat-solr /usr/share/tomcat/alf_data/solrhome /usr/share/tomcat/alf_data/solrContentStore /usr/share/tomcat/alf_data/solr4Backup /usr/share/tomcat/alf_data/newAlfrescoModels /etc/sysconfig/tomcat-solr /etc/cron.d/solr-cleaner.cron /usr/lib/systemd/system/tomcat-solr.service\n",
-                                            "cd /etc/chef; chef-client -z -j chef-client.json\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n",
-                                            "rm -fr /etc/chef/chef-client.json\n",
-                                            "rm -fr /etc/chef/nodes/*.json\n",
-                                            "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
-                                            "chmod 700 /usr/share/tomcat/shared/classes/alfresco/web-extension/share-cluster-application-context.xml\n",
-                                            "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
-                                        ]
-                                    ]
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/run-share-fk.sh"
+                                      ]
+                                  ]
                                 },
                                 "mode": "000700",
                                 "owner": "root",
@@ -1124,7 +1433,7 @@
                         {
                             "Ref": "AWS::Region"
                         },
-                        "ALFRESCOONEHVM"
+                        "ALFRESCOCS52"
                     ]
                 },
                 "InstanceMonitoring": "true",
@@ -1145,14 +1454,16 @@
                             "",
                             [
                                 "#!/bin/bash\n",
+                                "systemctl stop chef-boot.service\n",
+                                "systemctl disable chef-boot.service\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                "    --resource AlfrescoASLaunchConfig",
-                                "    --configsets InstallAndRun",
+                                "    --resource AlfrescoASLaunchConfigFrankfurt",
+                                "    --configsets Install2AndRun",
                                 "    --region     ",
                                 {
                                     "Ref": "AWS::Region"
@@ -1267,9 +1578,15 @@
                 },
                 "HealthCheckGracePeriod": "600",
                 "HealthCheckType": "EC2",
-                "LaunchConfigurationName": {
-                    "Ref": "AlfrescoASLaunchConfig"
-                },
+                "LaunchConfigurationName":{
+                    "Fn::If" : [
+                      "isNotFrankfurt",
+                      {
+                         "Ref": "AlfrescoASLaunchConfig"
+                     },{
+                        "Ref": "AlfrescoASLaunchConfigFrankfurt"
+                    }
+                    ]},
                 "LoadBalancerNames": [
                     {
                         "Ref": "ElasticLoadBalancer"
@@ -1312,6 +1629,8 @@
         },
         "IndexASLaunchConfig": {
             "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "DependsOn": "AlfrescoASLaunchConfig",
+            "Condition": "isNotFrankfurt",
             "Metadata": {
                 "AWS::CloudFormation::Init": {
                     "configSets": {
@@ -1323,28 +1642,277 @@
                     "Install": {
                         "files": {
                             "/etc/chef/chef-client.json": {
-                                "source": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/solr-52.json"
+                                      ]
+                                  ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            },
+                            "/etc/chef/replaceValues.sh": {
+                                "content": {
                                     "Fn::Join": [
-                                        "/",
+                                        "",
                                         [
+                                            "#!/bin/bash\n",
+                                            "sed -i 's/@@STACK_NAME@@/",
+                                            {
+                                                "Ref": "AWS::StackName"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@FQDN@@/",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "ElasticLoadBalancer",
+                                                    "DNSName"
+                                                ]
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_ACCESS_KEY@@/",
+                                            {
+                                                "Ref": "CfnKeys"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's#@@AWS_SECRET_KEY@@#",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "CfnKeys",
+                                                    "SecretAccessKey"
+                                                ]
+                                            },
+                                            "#g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_HOST@@/",
+                                            {
+                                                "Fn::GetAtt": [
+                                                    "RDSCluster",
+                                                    "Endpoint.Address"
+                                                ]
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_NAME@@/",
+                                            {
+                                                "Ref": "RDSDBName"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_USERNAME@@/",
+                                            {
+                                                "Ref": "RDSUsername"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@DB_PASSWORD@@/",
+                                            {
+                                                "Ref": "RDSPassword"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@CONTENTSTORE_S3_BUCKET@@/",
+                                            {
+                                                "Ref": "S3Bucket"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_REGION@@/",
+                                            {
+                                                "Ref": "AWS::Region"
+                                            },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_S3ENDPOINT@@/",
                                             {
                                                 "Fn::FindInMap": [
-                                                    "AWSInfoRegionMap",
+                                                    "S3EndPoints",
                                                     {
                                                         "Ref": "AWS::Region"
                                                     },
-                                                    "QuickStartS3URL"
+                                                    "endpoint"
                                                 ]
                                             },
+                                            "/g' /etc/chef/chef-client.json\n",
+                                            "ALFPASS=$(printf %s ",
                                             {
-                                                "Ref": "QSS3BucketName"
+                                                "Ref": "AlfrescoPassword"
                                             },
+                                            " | iconv -t utf16le | openssl md4| awk '{ print $2}')\n",
+                                            "sed -i \"s/@@ALFRESCO_PASSWORD@@/$ALFPASS/g\" /etc/chef/chef-client.json\n",
+                                            "export INSTANCEIDX=$(curl http://169.254.169.254/latest/meta-data/instance-id)\n",
+                                            "sed -i \"s/@@JVM_ROUTE@@/solr-$INSTANCEIDX/g\" /etc/chef/chef-client.json\n",
+                                            "sed -i 's/@@AWS_SG_NAME@@/AlfrescoSecurityGroup/g' /etc/chef/chef-client.json\n",
+                                            "export LOCALIP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4) \n",
+                                            "export LOCALNAME=$(curl http://169.254.169.254/latest/meta-data/local-hostname)\n ",
+                                            "export LOCALSHORTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname|awk -F. '{print $1}')\n",
+                                            "echo \"$LOCALIP $LOCALSHORTNAME $LOCALNAME\" >> /etc/hosts\n",
+                                            "curl -L ",
                                             {
-                                                "Ref": "QSS3KeyPrefix"
+                                                "Ref": "AlfrescoTrialLicense"
                                             },
-                                            "scripts/solr-51.json"
+                                            " -o /usr/share/tomcat/shared/classes/alfresco/extension/license/license.lic\n"
                                         ]
                                     ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            },
+                            "/etc/chef/run.sh": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/run-index.sh"
+                                      ]
+                                  ]
+                                },
+                                "mode": "000700",
+                                "owner": "root",
+                                "group": "root"
+                            }
+                        }
+                    },
+                    "Configure": {
+                        "commands": {
+                            "01_ReplaceValues": {
+                                "command": "/etc/chef/replaceValues.sh"
+                            },
+                            "02_RunChef": {
+                                "command": "/etc/chef/run.sh"
+                            }
+                        }
+                    }
+                }
+            },
+            "Properties": {
+                "KeyName": {
+                    "Ref": "KeyPairName"
+                },
+                "ImageId": {
+                    "Fn::FindInMap": [
+                        "AWSAMIRegionMap",
+                        {
+                            "Ref": "AWS::Region"
+                        },
+                        "ALFRESCOCS52"
+                    ]
+                },
+                "InstanceMonitoring": "true",
+                "IamInstanceProfile": {
+                    "Ref": "SetupRoleProfile"
+                },
+                "InstanceType": {
+                    "Ref": "IndexInstanceType"
+                },
+                "SecurityGroups": [
+                    {
+                        "Ref": "AlfrescoSecurityGroup"
+                    }
+                ],
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash\n",
+                                "systemctl stop chef-boot.service\n",
+                                "systemctl disable chef-boot.service\n",
+                                "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
+                                "/usr/bin/cfn-init",
+                                "    --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "    --resource IndexASLaunchConfig",
+                                "    --configsets InstallAndRun ",
+                                "    --region     ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "# Signal the status from cfn-init\n",
+                                "/usr/bin/cfn-signal -e $? ",
+                                " --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                " --resource IndexAutoScalingGroup",
+                                " --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n"
+                            ]
+                        ]
+                    }
+                }
+            }
+        },
+        "IndexASLaunchConfigFrankfurt": {
+            "Type": "AWS::AutoScaling::LaunchConfiguration",
+            "DependsOn" : "AlfrescoASLaunchConfigFrankfurt",
+            "Condition": "isFrankfurt",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "configSets": {
+                        "Install2AndRun": [
+                            "Install2",
+                            "Configure"
+                        ]
+                    },
+                    "Install2": {
+                        "files": {
+                            "/etc/chef/chef-client.json": {
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/solr-52.json"
+                                      ]
+                                  ]
                                 },
                                 "mode": "000700",
                                 "owner": "root",
@@ -1452,44 +2020,28 @@
                                 "group": "root"
                             },
                             "/etc/chef/run.sh": {
-                                "content": {
-                                    "Fn::Join": [
-                                        "",
-                                        [
-                                            "#!/bin/bash\n",
-                                            "systemctl stop nginx\n",
-                                            "systemctl disable nginx\n",
-                                            "yum remove -y nginx\n",
-                                            "systemctl disable haproxy\n",
-                                            "systemctl stop haproxy\n",
-                                            "yum remove -y haproxy\n",
-                                            "rm -fr /etc/haproxy/haproxy.cfg\n",
-                                            "rm -fr /var/log/haproxy\n",
-                                            "systemctl stop mysql-default\n",
-                                            "systemctl disable mysql-default\n",
-                                            "systemctl stop tomcat-solr\n",
-                                            "systemctl disable tomcat-solr\n",
-                                            "yum remove -y mysql-server\n",
-                                            "rm -fr /etc/mysql-default* /var/lib/mysql* /var/log/mysql-default* /usr/lib/systemd/system/mysql-default.service\n",
-                                            "rm -fr /etc/tomcat-share /var/lib/tomcat-share /usr/share/tomcat-share /var/log/tomcat-share /var/cache/tomcat-share /etc/sysconfig/tomcat-share /usr/lib/systemd/system/tomcat-share.service\n",
-                                            "cd /etc/chef; chef-client -z -j chef-client.json\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\nfalse\\r\\n--123456789'\n",
-                                            "curl 'http://localhost/alfresco/s/enterprise/admin?t=%2Fenterprise%2Fadmin%2Fadmin-transformations' -u admin:",
-                                            {
-                                                "Ref": "AlfrescoPassword"
-                                            },
-                                            " -H 'Content-Type: multipart/form-data; boundary=123456789' --data-binary $'--123456789\\r\\nContent-Disposition: form-data; name=\"Alfresco:Type=Configuration,Category=OOoJodconverter,id1=default|jodconverter.enabled\"\\r\\n\\r\\ntrue\\r\\n--123456789'\n",
-                                            "rm -fr /etc/chef/chef-client.json\n",
-                                            "rm -fr /etc/chef/nodes/*.json\n",
-                                            "chmod 700 /usr/share/tomcat/shared/classes/alfresco-global.properties\n",
-                                            "rm -fr /etc/chef/replaceValues.sh\n",
-                                            "rm -fr /etc/chef/run.sh\n"
-                                        ]
-                                    ]
+                              "source": {
+                                  "Fn::Join": [
+                                      "/",
+                                      [
+                                          {
+                                              "Fn::FindInMap": [
+                                                  "AWSInfoRegionMap",
+                                                  {
+                                                      "Ref": "AWS::Region"
+                                                  },
+                                                  "QuickStartS3URL"
+                                              ]
+                                          },
+                                          {
+                                              "Ref": "QSS3BucketName"
+                                          },
+                                          {
+                                              "Ref": "QSS3KeyPrefix"
+                                          },
+                                          "scripts/run-index-fk.sh"
+                                      ]
+                                  ]
                                 },
                                 "mode": "000700",
                                 "owner": "root",
@@ -1519,7 +2071,7 @@
                         {
                             "Ref": "AWS::Region"
                         },
-                        "ALFRESCOONEHVM"
+                        "ALFRESCOCS52"
                     ]
                 },
                 "InstanceMonitoring": "true",
@@ -1540,14 +2092,16 @@
                             "",
                             [
                                 "#!/bin/bash\n",
+                                "systemctl stop chef-boot.service\n",
+                                "systemctl disable chef-boot.service\n",
                                 "/usr/bin/easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz || sleep 10\n",
                                 "/usr/bin/cfn-init",
                                 "    --stack ",
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                "    --resource IndexASLaunchConfig",
-                                "    --configsets InstallAndRun ",
+                                "    --resource IndexASLaunchConfigFrankfurt",
+                                "    --configsets Install2AndRun ",
                                 "    --region     ",
                                 {
                                     "Ref": "AWS::Region"
@@ -1662,9 +2216,15 @@
                 },
                 "HealthCheckGracePeriod": "300",
                 "HealthCheckType": "EC2",
-                "LaunchConfigurationName": {
-                    "Ref": "IndexASLaunchConfig"
-                },
+                "LaunchConfigurationName":{
+                    "Fn::If" : [
+                      "isNotFrankfurt",
+                      {
+                         "Ref": "IndexASLaunchConfig"
+                     },{
+                        "Ref": "IndexASLaunchConfigFrankfurt"
+                    }
+                    ]},
                 "MaxSize": {
                     "Ref": "IndexNodesMaxSize"
                 },
