@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "This Alfresco Content Services 5.2 workload template deploys an Alfresco cluster behind an ELB load balancer in two private subnets. The cluster is configured to use an S3 bucket for storage and a multi-AZ Amazon RDS Aurora instance for the database (MySQL for Frankfurt). **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template. QS(5025)",
+    "Description": "This master template creates a VPC infrastructure for a multi-AZ, multi-tier deployment of Alfresco Content Services on AWS. It deploys a VPC with bastions and an Alfresco cluster behind an ELB. The cluster is configured to use an S3 bucket for storage and a multi-AZ Amazon RDS MySQL instance for the database. **WARNING** This template creates EC2 instances and related resources. You will be billed for the AWS resources used if you create a stack from this template.",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -350,24 +350,24 @@
         "QSS3KeyPrefix": {
             "AllowedPattern": "^[0-9a-zA-Z-]+(/[0-9a-zA-Z-]+)*$",
             "ConstraintDescription": "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with a forward slash (/), which is automatically appended.",
-            "Default": "alfresco/one/latest",
+            "Default": "alfresco/content/services/latest",
             "Description": "S3 key prefix for the Quick Start assets. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with a forward slash (/), which is automatically appended.",
             "Type": "String"
         },
         "RDSDBName": {
             "Default": "alfresco",
-            "Description": "DB name for the Amazon RDS Aurora database (MySQL if Frankfurt)",
+            "Description": "DB name for the Amazon RDS Aurora database (MySQL if non-Amazon Aurora region)",
             "Type": "String"
         },
         "RDSInstanceType": {
             "AllowedValues": [
-              "db.t2.small",
-              "db.t2.medium",
-              "db.r3.large",
-              "db.r3.xlarge",
-              "db.r3.2xlarge",
-              "db.r3.4xlarge",
-              "db.r3.8xlarge"
+                "db.t2.small",
+                "db.t2.medium",
+                "db.r3.large",
+                "db.r3.xlarge",
+                "db.r3.2xlarge",
+                "db.r3.4xlarge",
+                "db.r3.8xlarge"
             ],
             "ConstraintDescription": "Must contain valid RDS instance type",
             "Default": "db.t2.small",
@@ -386,7 +386,7 @@
         },
         "RDSAllocatedStorage": {
             "Default": "5",
-            "Description": "Size in GB for the Amazon RDS MySQL database allocated storage (only Frankfurt)",
+            "Description": "Size in GiB for the Amazon RDS MySQL database allocated storage (only non-Amazon Aurora region)",
             "Type": "String"
         },
         "RemoteAccessCIDR": {
@@ -549,7 +549,9 @@
                     ]
                 },
                 "Parameters": {
-                    "BastionAMIOS": "Amazon-Linux-HVM",
+                    "BastionAMIOS": {
+                        "Ref": "BastionAMIOS"
+                    },
                     "BastionInstanceType": {
                         "Ref": "BastionInstanceType"
                     },
@@ -572,7 +574,7 @@
                         "Ref": "QSS3BucketName"
                     },
                     "QSS3KeyPrefix": {
-                         "Fn::Join": [
+                        "Fn::Join": [
                             "/",
                             [
                                 {
@@ -598,7 +600,29 @@
             "DependsOn": "BastionStack",
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
-                "TemplateURL": "https://s3.amazonaws.com/cfn-templates-qs/alfresco-content-services.template",
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            {
+                                "Fn::FindInMap": [
+                                    "AWSInfoRegionMap",
+                                    {
+                                        "Ref": "AWS::Region"
+                                    },
+                                    "QuickStartS3URL"
+                                ]
+                            },
+                            {
+                                "Ref": "QSS3BucketName"
+                            },
+                            {
+                                "Ref": "QSS3KeyPrefix"
+                            },
+                            "templates/alfresco-content-services.template"
+                        ]
+                    ]
+                },
                 "Parameters": {
                     "AlfrescoInstanceType": {
                         "Ref": "AlfrescoInstanceType"
