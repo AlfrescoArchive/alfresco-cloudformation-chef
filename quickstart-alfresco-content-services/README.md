@@ -4,7 +4,7 @@
 This new Quick Start automatically deploys an Alfresco Content Services cluster on the AWS Cloud. The Quick Start was created by AWS in partnership with Alfresco Software, to integrate solutions and services from both companies.
 Alfresco Content Services is an Enterprise Content Management (ECM) system that is used for document and case management, project collaboration, web content publishing, and compliant records management. The flexible compute, storage, and database services that AWS offers make it an ideal platform for Alfresco Content Services. This Quick Start presents an enterprise-grade Alfresco Content Services configuration that you can adapt to virtually any scenario, and scale up, down, or out, depending on your use case.
 
-![Quick Start Alfresco Content Services Design Architecture](https://d3ulk6ur3a3ha.cloudfront.net/partner-network/QuickStart/datasheets/alfresco-architecture-diagram.png)
+![Quick Start Alfresco Content Services Design Architecture](https://d0.awsstatic.com/partner-network/QuickStart/datasheets/alfresco-content-services-architecture-diagram.png)
 
 The Quick Start architecture includes the following components:
 * Highly available Alfresco Content Services servers and Index servers deployed across two Availability Zones within your selected region. The servers take advantage of Auto Scaling and Elastic Load Balancing, with CPU-based thresholds that you can customize.
